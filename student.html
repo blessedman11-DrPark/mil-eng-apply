@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>학생 - 군사영어 문장 선택</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <header>
+    <a href="mil_eng_apply.html" class="back-link">← 메인으로</a>
+    <h1>문장 선택</h1>
+  </header>
+
+  <main class="container">
+    <section id="login-section">
+      <h2>학생 로그인</h2>
+      <form id="student-login-form">
+        <label for="student-id">학번</label>
+        <input type="text" id="student-id" placeholder="학번을 입력하세요" required />
+        <label for="student-name">이름</label>
+        <input type="text" id="student-name" placeholder="이름을 입력하세요" required />
+        <button type="submit">확인</button>
+      </form>
+    </section>
+
+    <section id="sentence-section" class="hidden">
+      <h2>문장 선택</h2>
+      <p id="student-info"></p>
+      <div id="sentence-list"></div>
+      <button id="confirm-btn" class="btn-primary" disabled>선택 확정</button>
+    </section>
+
+    <section id="result-section" class="hidden">
+      <h2>선택 완료</h2>
+      <div id="result-info"></div>
+      <button id="reset-btn">다시 선택</button>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/algorithm.js"></script>
+  <script src="js/student.js"></script>
+</body>
+</html>

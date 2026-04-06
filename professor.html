@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>교수 - 군사영어 문장 관리</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <header>
+    <a href="mil_eng_apply.html" class="back-link">← 메인으로</a>
+    <h1>문장 관리</h1>
+  </header>
+
+  <main class="container">
+    <section id="login-section">
+      <h2>교수 로그인</h2>
+      <form id="professor-login-form">
+        <label for="professor-pw">비밀번호</label>
+        <input type="password" id="professor-pw" placeholder="비밀번호를 입력하세요" required />
+        <button type="submit">로그인</button>
+      </form>
+    </section>
+
+    <section id="manage-section" class="hidden">
+      <h2>문장 목록 관리</h2>
+      <div class="toolbar">
+        <button id="add-sentence-btn" class="btn-primary">문장 추가</button>
+        <button id="reset-all-btn" class="btn-danger">전체 선택 초기화</button>
+        <a href="stats.html" class="btn-secondary">통계 보기</a>
+      </div>
+
+      <div id="add-form" class="hidden">
+        <h3>새 문장 추가</h3>
+        <form id="sentence-add-form">
+          <label for="new-sentence">영어 문장</label>
+          <textarea id="new-sentence" rows="3" placeholder="영어 문장을 입력하세요" required></textarea>
+          <label for="new-translation">한국어 번역 (선택)</label>
+          <textarea id="new-translation" rows="2" placeholder="한국어 번역을 입력하세요"></textarea>
+          <label for="new-category">카테고리</label>
+          <input type="text" id="new-category" placeholder="예: 지휘통신, 작전" />
+          <button type="submit">추가</button>
+          <button type="button" id="cancel-add-btn">취소</button>
+        </form>
+      </div>
+
+      <div id="sentence-table-wrap">
+        <table id="sentence-table">
+          <thead>
+            <tr>
+              <th>번호</th>
+              <th>문장</th>
+              <th>카테고리</th>
+              <th>선택 학생 수</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="sentence-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/professor.js"></script>
+</body>
+</html>
