@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const cnt3 = byChoice3[n]?.length || 0;
       const total_applicants = cnt1 + cnt2 + cnt3;
       const totalCell = total_applicants > 0
-        ? `<span style="font-weight:600">${total_applicants}명</span> <span style="color:#8896a5;font-size:.85em">(1지망 ${cnt1} / 2지망 ${cnt2} / 3지망 ${cnt3})</span>`
+        ? `<span style="font-weight:600">${total_applicants}명</span> <span style="color:#8896a5;font-size:.85em">(${cnt1}, ${cnt2}, ${cnt3})</span>`
         : '<span class="text-muted">-</span>';
       const c1 = byChoice1[n]?.join(', ') || '<span class="text-muted">-</span>';
       const c2 = byChoice2[n]?.join(', ') || '<span class="text-muted">-</span>';
