@@ -37,7 +37,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (rounds?.[0]) {
       const r = rounds[0].round_number;
       document.getElementById('round-display').textContent = `(${r}회차)`;
-      document.getElementById('form-round-badge').textContent = `${r}회차 신청`;
+      const badge = document.getElementById('form-round-badge');
+      badge.textContent = `📋 ${r}회차 신청`;
+      badge.style.display = '';
     }
 
     totalSentences = settings.total_sentences;
