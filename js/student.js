@@ -63,14 +63,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function setAssignedMode(assigned) {
     const submitBtn = document.getElementById('submit-btn');
+    const notice = document.getElementById('assigned-notice');
     if (assigned) {
       submitBtn.textContent = '배정 결과 확인';
       submitBtn.className = 'btn btn-secondary';
       document.getElementById('choice1').parentElement.parentElement.classList.add('hidden');
+      notice.style.display = '';
     } else {
       submitBtn.textContent = '신청하기';
       submitBtn.className = 'btn btn-primary';
       document.getElementById('choice1').parentElement.parentElement.classList.remove('hidden');
+      notice.style.display = 'none';
     }
   }
 
