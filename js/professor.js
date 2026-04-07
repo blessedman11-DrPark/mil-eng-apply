@@ -379,7 +379,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const c1 = byChoice1[n]?.join(', ') || '<span class="text-muted">-</span>';
       const c2 = byChoice2[n]?.join(', ') || '<span class="text-muted">-</span>';
       const c3 = byChoice3[n]?.join(', ') || '<span class="text-muted">-</span>';
-      return `<tr><td style="text-align:center;font-weight:600">${n}번</td><td>${totalCell}</td><td>${c1}</td><td>${c2}</td><td>${c3}</td></tr>`;
+      return `<tr><td style="text-align:center;font-weight:600">${n}번</td><td style="white-space:nowrap">${totalCell}</td><td>${c1}</td><td>${c2}</td><td>${c3}</td></tr>`;
     }).join('');
   }
 
