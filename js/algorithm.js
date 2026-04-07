@@ -96,20 +96,7 @@ async function runAssignment() {
       queue = nextQueue;
     }
 
-    // 5. 모든 지망 탈락 학생 → 미배정 문장 중 랜덤 배정
-    const unassigned = submissions.filter(s => !assigned[s.student_id]);
-    const available = [];
-    for (let i = 1; i <= totalSentences; i++) {
-      if (!takenSentences.has(i)) available.push(i);
-    }
-    // 셔플
-    for (let i = available.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [available[i], available[j]] = [available[j], available[i]];
-    }
-    unassigned.forEach((s, idx) => {
-      if (idx < available.length) assigned[s.student_id] = available[idx];
-    });
+    // 5. 모든 지망 탈락 학생 → 배정 없음 (탈락 처리)
 
     // ────────────────────────────────────────────────────────
     // 6. DB 업데이트
@@ -161,9 +148,14 @@ async function runAssignment() {
     // 6d. is_assigned = true
     await db.from(TABLES.SETTINGS).update({ is_assigned: true }).eq('id', 1);
 
+    const failedCount = submissions.length - assignedStudents.length;
+    const msg = failedCount > 0
+      ? `${assignedStudents.length}명 배정 완료, ${failedCount}명 탈락 (${currentRound.round_number}회차)`
+      : `${assignedStudents.length}명 배정 완료 (${currentRound.round_number}회차)`;
+
     return {
       success: true,
-      message: `${assignedStudents.length}명 배정 완료 (${currentRound.round_number}회차)`,
+      message: msg,
       assignments: assigned,
     };
 
