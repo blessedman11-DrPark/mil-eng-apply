@@ -369,10 +369,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     tbody.innerHTML = Array.from({ length: total }, (_, i) => {
       const n = i + 1;
+      const cnt1 = byChoice1[n]?.length || 0;
+      const cnt2 = byChoice2[n]?.length || 0;
+      const cnt3 = byChoice3[n]?.length || 0;
+      const total_applicants = cnt1 + cnt2 + cnt3;
+      const totalCell = total_applicants > 0
+        ? `<span style="font-weight:600">${total_applicants}명</span> <span style="color:#8896a5;font-size:.85em">(1지망 ${cnt1} / 2지망 ${cnt2} / 3지망 ${cnt3})</span>`
+        : '<span class="text-muted">-</span>';
       const c1 = byChoice1[n]?.join(', ') || '<span class="text-muted">-</span>';
       const c2 = byChoice2[n]?.join(', ') || '<span class="text-muted">-</span>';
       const c3 = byChoice3[n]?.join(', ') || '<span class="text-muted">-</span>';
-      return `<tr><td style="text-align:center;font-weight:600">${n}번</td><td>${c1}</td><td>${c2}</td><td>${c3}</td></tr>`;
+      return `<tr><td style="text-align:center;font-weight:600">${n}번</td><td>${totalCell}</td><td>${c1}</td><td>${c2}</td><td>${c3}</td></tr>`;
     }).join('');
   }
 
