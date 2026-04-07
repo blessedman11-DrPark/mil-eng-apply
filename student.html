@@ -1,47 +1,93 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>학생 - 군사영어 문장 선택</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>학생 - 문장 신청</title>
+  <link rel="stylesheet" href="css/style.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
-  <header>
-    <a href="mil_eng_apply.html" class="back-link">← 메인으로</a>
-    <h1>문장 선택</h1>
-  </header>
+<header>
+  <a href="mil_eng_apply.html" class="back-link">← 메인</a>
+  <h1>문장 신청</h1>
+</header>
 
-  <main class="container">
-    <section id="login-section">
-      <h2>학생 로그인</h2>
-      <form id="student-login-form">
-        <label for="student-id">학번</label>
-        <input type="text" id="student-id" placeholder="학번을 입력하세요" required />
-        <label for="student-name">이름</label>
-        <input type="text" id="student-name" placeholder="이름을 입력하세요" required />
-        <button type="submit">확인</button>
-      </form>
-    </section>
+<main class="container" style="max-width:520px">
 
-    <section id="sentence-section" class="hidden">
-      <h2>문장 선택</h2>
-      <p id="student-info"></p>
-      <div id="sentence-list"></div>
-      <button id="confirm-btn" class="btn-primary" disabled>선택 확정</button>
-    </section>
+  <!-- 마감 안내 (기본 숨김) -->
+  <div id="closed-msg" class="section-card hidden">
+    <div class="blocked-msg">
+      <div class="icon">🔒</div>
+      <h2>신청이 마감되었습니다</h2>
+      <p class="text-muted mt-1">교수님이 신청을 재개하면 다시 접속해주세요.</p>
+    </div>
+  </div>
 
-    <section id="result-section" class="hidden">
-      <h2>선택 완료</h2>
-      <div id="result-info"></div>
-      <button id="reset-btn">다시 선택</button>
-    </section>
-  </main>
+  <!-- 신청 폼 -->
+  <div id="form-section" class="section-card hidden">
+    <h2>희망 문장 신청</h2>
 
-  <script src="js/config.js"></script>
-  <script src="js/supabase.js"></script>
-  <script src="js/algorithm.js"></script>
-  <script src="js/student.js"></script>
+    <div class="form-group">
+      <label for="student-name">이름 <span style="color:#e84444">*</span></label>
+      <input type="text" id="student-name" placeholder="이름을 입력하세요" maxlength="20"/>
+    </div>
+
+    <div class="form-group">
+      <label for="student-id">학번 <span style="color:#e84444">*</span></label>
+      <input type="text" id="student-id" placeholder="학번을 입력하세요" maxlength="20"/>
+    </div>
+
+    <div class="form-group">
+      <label>희망 문장 번호 <span style="color:#e84444">*</span>
+        <span id="range-hint" class="input-hint"></span>
+      </label>
+      <div class="choice-row">
+        <div>
+          <input type="number" id="choice1" inputmode="numeric" placeholder="1지망" min="1"/>
+          <div class="choice-label">1지망</div>
+        </div>
+        <div>
+          <input type="number" id="choice2" inputmode="numeric" placeholder="2지망" min="1"/>
+          <div class="choice-label">2지망</div>
+        </div>
+        <div>
+          <input type="number" id="choice3" inputmode="numeric" placeholder="3지망" min="1"/>
+          <div class="choice-label">3지망</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="form-error" class="msg msg-error hidden"></div>
+
+    <button class="btn btn-primary" id="submit-btn" style="width:100%;margin-top:.5rem">신청하기</button>
+  </div>
+
+  <!-- 완료 메시지 -->
+  <div id="done-section" class="section-card hidden">
+    <div style="text-align:center;padding:1.5rem 0">
+      <div style="font-size:2.5rem;margin-bottom:.75rem">✅</div>
+      <h2 style="margin-bottom:.5rem">신청 완료</h2>
+      <p class="text-muted" id="done-name"></p>
+      <div id="done-choices" class="msg msg-info" style="margin-top:1rem;text-align:left"></div>
+    </div>
+  </div>
+
+  <!-- 배정 결과 -->
+  <div id="result-section" class="section-card hidden">
+    <h2>🎉 배정 결과</h2>
+    <div id="result-content"></div>
+  </div>
+
+  <!-- 로딩 -->
+  <div id="loading-section" class="section-card" style="text-align:center;padding:2rem">
+    <p class="text-muted">불러오는 중...</p>
+  </div>
+
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/student.js"></script>
 </body>
 </html>

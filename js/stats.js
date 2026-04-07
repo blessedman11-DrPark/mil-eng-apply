@@ -1,44 +1,190 @@
-// stats.js — 선택 현황 통계 로직
+// stats.js
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (!initSupabase()) return;
 
-  const totalStudentsEl = document.getElementById('total-students');
-  const selectedStudentsEl = document.getElementById('selected-students');
-  const totalSentencesEl = document.getElementById('total-sentences');
-  const tableBody = document.getElementById('stats-table-body');
+  let barChart = null;
 
-  const { data: sentences } = await supabase.from(TABLES.SENTENCES).select('*').order('id');
-  const { data: selections } = await supabase.from(TABLES.SELECTIONS).select('*');
-  const { data: students } = await supabase.from(TABLES.STUDENTS).select('*');
+  function fmt(iso) {
+    if (!iso) return '-';
+    return new Date(iso).toLocaleString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+  }
+  function fmtDate(iso) {
+    if (!iso) return '-';
+    return new Date(iso).toLocaleDateString('ko-KR');
+  }
+  function empty(tbodyId, cols) {
+    document.getElementById(tbodyId).innerHTML =
+      `<tr><td colspan="${cols}" class="text-center text-muted" style="padding:1rem">데이터가 없습니다</td></tr>`;
+  }
 
-  const allSentences = sentences || [];
-  const allSelections = selections || [];
-  const allStudents = students || [];
-
-  // 요약 통계
-  const uniqueSelectedStudents = new Set(allSelections.map(s => s.student_id)).size;
-  totalStudentsEl.textContent = allStudents.length || uniqueSelectedStudents;
-  selectedStudentsEl.textContent = uniqueSelectedStudents;
-  totalSentencesEl.textContent = allSentences.length;
-
-  // 문장별 집계
-  tableBody.innerHTML = '';
-  allSentences.forEach((s, idx) => {
-    const sels = allSelections.filter(sel => sel.sentence_id === s.id);
-    const names = sels.map(sel => escapeHtml(sel.student_name || sel.student_id)).join(', ');
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${idx + 1}</td>
-      <td>${escapeHtml(s.sentence)}</td>
-      <td>${s.category ? escapeHtml(s.category) : '-'}</td>
-      <td>${sels.length}</td>
-      <td>${names || '-'}</td>
-    `;
-    tableBody.appendChild(tr);
+  // ════════ 탭 전환 ════════
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      if (btn.dataset.tab === 'rounds') loadRoundsTab();
+    });
   });
 
-  function escapeHtml(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // ════════ 새로고침 ════════
+  document.getElementById('refresh-btn').addEventListener('click', loadAll);
+
+  // ════════════════════════════════════════════════════════════
+  // 탭1: 학생별 현황
+  // ════════════════════════════════════════════════════════════
+  async function loadStudentsTab() {
+    const { data: wh } = await db.from(TABLES.WIN_HISTORY).select('*').order('win_count', { ascending: false });
+
+    if (!wh?.length) {
+      document.getElementById('chart-empty').classList.remove('hidden');
+      document.getElementById('chart-wrap').style.display = 'none';
+      empty('tbody-rank', 5);
+      return;
+    }
+
+    document.getElementById('chart-empty').classList.add('hidden');
+    document.getElementById('chart-wrap').style.display = '';
+
+    // ── 차트 ──
+    const labels = wh.map(h => h.student_id);
+    const values = wh.map(h => h.win_count);
+    const maxVal = Math.max(...values);
+
+    // 그라데이션 색상: 높을수록 진한 파란색
+    const colors = values.map(v => {
+      const ratio = maxVal > 0 ? v / maxVal : 0;
+      const r = Math.round(197 + (26 - 197) * ratio);
+      const g = Math.round(216 + (71 - 216) * ratio);
+      const b = Math.round(255 + (214 - 255) * ratio);
+      return `rgb(${r},${g},${b})`;
+    });
+
+    // 학생 수에 따라 캔버스 너비 조정
+    const minW = Math.max(500, labels.length * 64);
+    document.getElementById('chart-wrap').style.width = minW + 'px';
+
+    const ctx = document.getElementById('bar-chart').getContext('2d');
+    if (barChart) barChart.destroy();
+
+    ChartDataLabels; // ensure plugin is registered
+    barChart = new Chart(ctx, {
+      type: 'bar',
+      plugins: [ChartDataLabels],
+      data: {
+        labels,
+        datasets: [{
+          label: '당첨 횟수',
+          data: values,
+          backgroundColor: colors,
+          borderRadius: 5,
+          borderSkipped: false,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: '학생별 누계 당첨 횟수', font: { size: 14 } },
+          datalabels: {
+            anchor: 'end',
+            align: 'end',
+            color: '#333',
+            font: { weight: 'bold', size: 12 },
+            formatter: v => v,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1, precision: 0 },
+            grid: { color: '#eaeef5' },
+          },
+          x: { grid: { display: false } },
+        },
+      },
+    });
+
+    // ── 순위 테이블 ──
+    document.getElementById('tbody-rank').innerHTML = wh.map((h, i) => `<tr>
+      <td>${i + 1}</td>
+      <td>${h.student_id}</td>
+      <td>${h.student_name}</td>
+      <td>${h.win_count}</td>
+      <td>${fmtDate(h.last_won_at)}</td>
+    </tr>`).join('');
+
+    // ── 미당첨: submissions에서 win_history에 없는 학생 ──
+    const { data: subs } = await db.from(TABLES.SUBMISSIONS).select('student_id,student_name');
+    if (subs?.length) {
+      const wonIds = new Set(wh.map(h => h.student_id));
+      const noWin = (subs || []).filter(s => !wonIds.has(s.student_id));
+      const sec = document.getElementById('no-win-section');
+      if (noWin.length) {
+        sec.style.display = '';
+        document.getElementById('no-win-list').textContent =
+          noWin.map(s => `${s.student_name} (${s.student_id})`).join(', ');
+      } else {
+        sec.style.display = 'none';
+      }
+    }
   }
+
+  // ════════════════════════════════════════════════════════════
+  // 탭2: 회차별 기록
+  // ════════════════════════════════════════════════════════════
+  async function loadRoundsTab() {
+    const [{ data: rounds }, { data: wr }] = await Promise.all([
+      db.from(TABLES.ROUNDS).select('*').order('round_number', { ascending: false }),
+      db.from(TABLES.WIN_RECORDS).select('*'),
+    ]);
+
+    // 드롭다운
+    const sel = document.getElementById('round-select');
+    sel.innerHTML = '<option value="">-- 회차를 선택하세요 --</option>' +
+      (rounds || []).map(r => `<option value="${r.id}">${r.round_number}회차 (${fmtDate(r.executed_at)})</option>`).join('');
+
+    // 회차 요약 테이블
+    if (!rounds?.length) { empty('tbody-rounds-summary', 3); }
+    else {
+      const countMap = {};
+      (wr || []).forEach(r => { countMap[r.round_id] = (countMap[r.round_id] || 0) + 1; });
+      document.getElementById('tbody-rounds-summary').innerHTML = rounds.map(r => `<tr>
+        <td>${r.round_number}회차</td>
+        <td>${fmtDate(r.executed_at)}</td>
+        <td>${countMap[r.id] || 0}명</td>
+      </tr>`).join('');
+    }
+
+    // 회차 선택 핸들러
+    sel.addEventListener('change', async () => {
+      const rid = parseInt(sel.value);
+      const detailSec = document.getElementById('round-detail-section');
+      if (!rid) { detailSec.style.display = 'none'; return; }
+
+      const round = (rounds || []).find(r => r.id === rid);
+      const { data: records } = await db.from(TABLES.WIN_RECORDS).select('*')
+        .eq('round_id', rid).order('assigned_sentence');
+
+      detailSec.style.display = '';
+      document.getElementById('round-detail-title').textContent =
+        `${round?.round_number}회차 당첨자 목록`;
+
+      if (!records?.length) { empty('tbody-round-detail', 4); return; }
+      document.getElementById('tbody-round-detail').innerHTML = records.map(r => `<tr>
+        <td>${r.student_id}</td><td>${r.student_name}</td>
+        <td>${r.assigned_sentence}번</td><td>${fmt(r.won_at)}</td>
+      </tr>`).join('');
+    });
+  }
+
+  async function loadAll() {
+    await loadStudentsTab();
+    // 탭2는 탭 전환 시 로드
+  }
+
+  await loadAll();
 });

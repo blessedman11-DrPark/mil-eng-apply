@@ -1,21 +1,24 @@
-// Supabase 클라이언트 초기화 (CDN 버전 사용)
-// HTML에서 이 파일보다 먼저 Supabase CDN 스크립트를 로드하세요:
-// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+// Supabase 클라이언트
+// 사전 로드 필요: https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js
 
-let supabase;
+// CDN 로드 후 window.supabase 가 Supabase 모듈을 가리킴.
+// initSupabase() 호출 뒤부터 아래 'db' 변수를 클라이언트로 사용.
+var db;
 
 function initSupabase() {
   if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL') {
-    console.error('config.js에서 SUPABASE_URL을 설정해주세요.');
+    console.error('js/config.js에서 SUPABASE_URL을 설정해주세요.');
     return false;
   }
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   return true;
 }
 
 // 테이블 이름 상수
 const TABLES = {
-  SENTENCES: 'sentences',
-  SELECTIONS: 'selections',
-  STUDENTS: 'students',
+  SETTINGS:    'settings',
+  ROUNDS:      'rounds',
+  SUBMISSIONS: 'submissions',
+  WIN_HISTORY: 'win_history',
+  WIN_RECORDS: 'win_records',
 };

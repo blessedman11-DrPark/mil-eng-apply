@@ -1,69 +1,262 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>교수 - 군사영어 문장 관리</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>교수 대시보드</title>
+  <link rel="stylesheet" href="css/style.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
-  <header>
-    <a href="mil_eng_apply.html" class="back-link">← 메인으로</a>
-    <h1>문장 관리</h1>
-  </header>
+<header>
+  <a href="mil_eng_apply.html" class="back-link">← 메인</a>
+  <h1>교수 대시보드</h1>
+</header>
 
-  <main class="container">
-    <section id="login-section">
-      <h2>교수 로그인</h2>
-      <form id="professor-login-form">
-        <label for="professor-pw">비밀번호</label>
-        <input type="password" id="professor-pw" placeholder="비밀번호를 입력하세요" required />
-        <button type="submit">로그인</button>
-      </form>
-    </section>
+<main class="container">
+  <!-- 탭 바 -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="settings">설정</button>
+    <button class="tab-btn" data-tab="status">현황</button>
+    <button class="tab-btn" data-tab="results">배정 결과</button>
+    <button class="tab-btn" data-tab="statistics">통계</button>
+  </div>
 
-    <section id="manage-section" class="hidden">
-      <h2>문장 목록 관리</h2>
-      <div class="toolbar">
-        <button id="add-sentence-btn" class="btn-primary">문장 추가</button>
-        <button id="reset-all-btn" class="btn-danger">전체 선택 초기화</button>
-        <a href="stats.html" class="btn-secondary">통계 보기</a>
+  <!-- ════════ 탭1: 설정 ════════ -->
+  <div id="tab-settings" class="tab-content active">
+
+    <!-- 기본 설정 -->
+    <div class="section-card">
+      <h2>기본 설정</h2>
+
+      <div class="form-group">
+        <label>총 문장 수</label>
+        <div class="input-row">
+          <input type="number" id="total-sentences-input" min="1" max="500" style="max-width:120px"/>
+          <button class="btn btn-primary btn-sm" id="save-settings-btn">저장</button>
+        </div>
       </div>
 
-      <div id="add-form" class="hidden">
-        <h3>새 문장 추가</h3>
-        <form id="sentence-add-form">
-          <label for="new-sentence">영어 문장</label>
-          <textarea id="new-sentence" rows="3" placeholder="영어 문장을 입력하세요" required></textarea>
-          <label for="new-translation">한국어 번역 (선택)</label>
-          <textarea id="new-translation" rows="2" placeholder="한국어 번역을 입력하세요"></textarea>
-          <label for="new-category">카테고리</label>
-          <input type="text" id="new-category" placeholder="예: 지휘통신, 작전" />
-          <button type="submit">추가</button>
-          <button type="button" id="cancel-add-btn">취소</button>
-        </form>
+      <div class="form-group">
+        <label>제출 허용</label>
+        <div class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" id="is-open-toggle"/>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-label" id="is-open-label">-</span>
+        </div>
       </div>
 
-      <div id="sentence-table-wrap">
-        <table id="sentence-table">
-          <thead>
-            <tr>
-              <th>번호</th>
-              <th>문장</th>
-              <th>카테고리</th>
-              <th>선택 학생 수</th>
-              <th>관리</th>
-            </tr>
-          </thead>
-          <tbody id="sentence-table-body"></tbody>
+      <div class="form-group" style="margin-bottom:0">
+        <label>회차 관리</label>
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" id="new-round-btn">새 회차 시작</button>
+          <span class="text-muted" id="current-round-info"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 데이터 관리 아코디언 -->
+    <div class="section-card">
+      <h2>데이터 관리</h2>
+
+      <!-- 제출 데이터 -->
+      <details class="accordion" id="accordion-submissions">
+        <summary>제출 데이터 관리</summary>
+        <div class="accordion-body">
+          <div class="table-toolbar">
+            <button class="btn btn-sm btn-danger" id="del-sel-submissions">선택 삭제</button>
+            <button class="btn btn-sm btn-secondary" id="del-all-submissions">전체 삭제</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th><input type="checkbox" id="chk-all-sub" class="row-check"/></th>
+                <th>학번</th><th>이름</th><th>1지망</th><th>2지망</th><th>3지망</th><th>제출일시</th>
+              </tr></thead>
+              <tbody id="tbody-submissions"></tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+      <!-- 당첨 누계 -->
+      <details class="accordion" id="accordion-win-history">
+        <summary>당첨 누계 관리</summary>
+        <div class="accordion-body">
+          <div class="table-toolbar">
+            <button class="btn btn-sm btn-danger" id="del-sel-win-history">선택 삭제</button>
+            <button class="btn btn-sm btn-secondary" id="del-all-win-history">전체 삭제</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th><input type="checkbox" id="chk-all-wh" class="row-check"/></th>
+                <th>학번</th><th>이름</th><th>총 당첨</th><th>마지막 당첨일</th>
+              </tr></thead>
+              <tbody id="tbody-win-history"></tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+      <!-- 당첨 기록 -->
+      <details class="accordion" id="accordion-win-records">
+        <summary>당첨 기록 관리</summary>
+        <div class="accordion-body">
+          <div class="table-toolbar">
+            <select id="wr-round-filter" style="height:32px;font-size:.85rem"><option value="">전체 회차</option></select>
+            <input type="text" id="wr-search" placeholder="학번/이름 검색" style="flex:1;min-width:100px;height:32px"/>
+            <button class="btn btn-sm btn-danger" id="del-sel-win-records">선택 삭제</button>
+            <button class="btn btn-sm btn-secondary" id="del-all-win-records">전체 삭제</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th><input type="checkbox" id="chk-all-wr" class="row-check"/></th>
+                <th>회차</th><th>학번</th><th>이름</th><th>배정 문장</th><th>당첨 일시</th>
+              </tr></thead>
+              <tbody id="tbody-win-records"></tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+      <!-- 회차 기록 -->
+      <details class="accordion" id="accordion-rounds">
+        <summary>회차 기록 관리</summary>
+        <div class="accordion-body">
+          <div class="table-toolbar">
+            <button class="btn btn-sm btn-danger" id="del-sel-rounds">선택 삭제</button>
+            <button class="btn btn-sm btn-secondary" id="del-all-rounds">전체 삭제</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr>
+                <th><input type="checkbox" id="chk-all-rd" class="row-check"/></th>
+                <th>회차</th><th>실행 일시</th>
+              </tr></thead>
+              <tbody id="tbody-rounds"></tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- 전체 초기화 -->
+    <div class="danger-zone">
+      <h3>⚠️ 전체 초기화</h3>
+      <p>제출 데이터·당첨 누계·당첨 기록·회차를 모두 삭제합니다. 되돌릴 수 없습니다.</p>
+      <button class="btn btn-danger" id="global-reset-btn">🔴 전체 초기화</button>
+    </div>
+  </div>
+
+  <!-- ════════ 탭2: 현황 ════════ -->
+  <div id="tab-status" class="tab-content">
+    <div class="section-card">
+      <div class="flex-row" style="justify-content:space-between;margin-bottom:1rem">
+        <div>
+          <h2 style="margin:0">실시간 제출 현황</h2>
+          <span class="text-muted" id="realtime-badge" style="font-size:.82rem">연결 중...</span>
+        </div>
+        <div class="flex-row">
+          <span style="font-size:.95rem">총 <strong id="status-count">0</strong>명</span>
+          <button class="btn btn-primary" id="run-assign-btn">배정 실행</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>학번</th><th>이름</th><th>1지망</th><th>2지망</th><th>3지망</th><th>제출일시</th></tr></thead>
+          <tbody id="tbody-status"></tbody>
         </table>
       </div>
-    </section>
-  </main>
+    </div>
+  </div>
 
-  <script src="js/config.js"></script>
-  <script src="js/supabase.js"></script>
-  <script src="js/professor.js"></script>
+  <!-- ════════ 탭3: 배정 결과 ════════ -->
+  <div id="tab-results" class="tab-content">
+    <div class="section-card">
+      <div class="flex-row" style="justify-content:space-between;margin-bottom:1rem">
+        <h2 style="margin:0">배정 결과</h2>
+        <button class="btn btn-secondary btn-sm" id="csv-btn">📥 CSV 다운로드</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>문장 번호</th><th>이름</th></tr></thead>
+          <tbody id="tbody-results"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ 탭4: 통계 ════════ -->
+  <div id="tab-statistics" class="tab-content">
+
+    <div class="section-card">
+      <h2>학생별 누계 당첨 횟수</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>순위</th><th>학번</th><th>이름</th><th>당첨 횟수</th><th>마지막 당첨일</th></tr></thead>
+          <tbody id="stats-tbody-wh"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2>회차별 당첨 기록</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>회차</th><th>학번</th><th>이름</th><th>배정 문장</th><th>당첨 일시</th></tr></thead>
+          <tbody id="stats-tbody-wr"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2>문장별 당첨 빈도</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>문장 번호</th><th>당첨 횟수</th></tr></thead>
+          <tbody id="stats-tbody-sf"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h2>월별 당첨 현황</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>월</th><th>당첨 건수</th></tr></thead>
+          <tbody id="stats-tbody-mo"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Toast -->
+<div id="toast-container"></div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <h3 id="confirm-title">확인</h3>
+    <p id="confirm-msg"></p>
+    <div id="confirm-input-wrap" class="form-group hidden" style="margin-top:.75rem">
+      <label id="confirm-input-label"></label>
+      <input type="text" id="confirm-input" autocomplete="off"/>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" id="confirm-cancel-btn">취소</button>
+      <button class="btn btn-danger" id="confirm-ok-btn">확인</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/algorithm.js"></script>
+<script src="js/professor.js"></script>
 </body>
 </html>
