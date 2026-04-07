@@ -322,22 +322,68 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ════════════════════════════════════════════════════════════
   // 탭2: 현황 (Realtime)
   // ════════════════════════════════════════════════════════════
+
+  // 서브 탭 전환
+  document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sub-tab-btn').forEach(b => {
+        b.style.color = '#8896a5';
+        b.style.borderBottomColor = 'transparent';
+      });
+      btn.style.color = '#4a7fff';
+      btn.style.borderBottomColor = '#4a7fff';
+      const target = btn.dataset.subtab;
+      document.getElementById('subtab-by-student').style.display = target === 'by-student' ? '' : 'none';
+      document.getElementById('subtab-by-sentence').style.display = target === 'by-sentence' ? '' : 'none';
+      if (target === 'by-sentence') loadSentenceStatusTable();
+    });
+  });
+
   async function loadStatusTable() {
-    const { data } = await db.from(TABLES.SUBMISSIONS).select('*').order('created_at');
+    const { data } = await db.from(TABLES.SUBMISSIONS).select('*').order('student_id');
     const tbody = document.getElementById('tbody-status');
     document.getElementById('status-count').textContent = data?.length || 0;
-    if (!data?.length) { empty('tbody-status', 6, '제출된 데이터가 없습니다'); return; }
+    if (!data?.length) { empty('tbody-status', 5, '제출된 데이터가 없습니다'); return; }
     tbody.innerHTML = data.map(s => `<tr>
       <td>${s.student_id}</td><td>${s.student_name}</td>
       <td>${s.choice1 ?? '-'}</td><td>${s.choice2 ?? '-'}</td><td>${s.choice3 ?? '-'}</td>
-      <td>${fmt(s.created_at)}</td>
     </tr>`).join('');
+  }
+
+  async function loadSentenceStatusTable() {
+    const [{ data: settings }, { data: subs }] = await Promise.all([
+      db.from(TABLES.SETTINGS).select('total_sentences').single(),
+      db.from(TABLES.SUBMISSIONS).select('student_id,student_name,choice1,choice2,choice3'),
+    ]);
+    const total = settings?.total_sentences || 20;
+    const tbody = document.getElementById('tbody-sentence-status');
+
+    // 문장 번호별로 지망 신청자 집계
+    const byChoice1 = {}, byChoice2 = {}, byChoice3 = {};
+    (subs || []).forEach(s => {
+      if (s.choice1) { (byChoice1[s.choice1] = byChoice1[s.choice1] || []).push(s.student_name); }
+      if (s.choice2) { (byChoice2[s.choice2] = byChoice2[s.choice2] || []).push(s.student_name); }
+      if (s.choice3) { (byChoice3[s.choice3] = byChoice3[s.choice3] || []).push(s.student_name); }
+    });
+
+    tbody.innerHTML = Array.from({ length: total }, (_, i) => {
+      const n = i + 1;
+      const c1 = byChoice1[n]?.join(', ') || '<span class="text-muted">-</span>';
+      const c2 = byChoice2[n]?.join(', ') || '<span class="text-muted">-</span>';
+      const c3 = byChoice3[n]?.join(', ') || '<span class="text-muted">-</span>';
+      return `<tr><td style="text-align:center;font-weight:600">${n}번</td><td>${c1}</td><td>${c2}</td><td>${c3}</td></tr>`;
+    }).join('');
   }
 
   function setupRealtime() {
     loadStatusTable();
     db.channel('prof-status')
-      .on('postgres_changes', { event: '*', schema: 'public', table: TABLES.SUBMISSIONS }, loadStatusTable)
+      .on('postgres_changes', { event: '*', schema: 'public', table: TABLES.SUBMISSIONS }, () => {
+        loadStatusTable();
+        if (document.getElementById('subtab-by-sentence').style.display !== 'none') {
+          loadSentenceStatusTable();
+        }
+      })
       .subscribe(status => {
         document.getElementById('realtime-badge').textContent =
           status === 'SUBSCRIBED' ? '● 실시간 연결됨' : '연결 중...';

@@ -77,14 +77,23 @@
     if (!pw) return;
 
     document.getElementById('pw-confirm').disabled = true;
-    const { data, error } = await db.from(TABLES.SETTINGS).select('password1,password2').single();
+    const { data, error } = await db.from(TABLES.SETTINGS).select('password1,password2').maybeSingle();
     document.getElementById('pw-confirm').disabled = false;
 
-    if (error || !data) {
-      pwError.textContent = '설정 정보를 불러올 수 없습니다.';
+    console.log('[교수인증] data:', data, '/ error:', error);
+
+    if (error) {
+      pwError.textContent = `DB 오류: ${error.message} (code: ${error.code})`;
       pwError.classList.remove('hidden');
       return;
     }
+    if (!data) {
+      pwError.textContent = 'settings 테이블에 데이터가 없습니다. Supabase에서 행을 추가해주세요.';
+      pwError.classList.remove('hidden');
+      return;
+    }
+
+    console.log('[교수인증] password1:', JSON.stringify(data.password1), '/ password2:', JSON.stringify(data.password2), '/ 입력값:', JSON.stringify(pw));
 
     if (pw === data.password1 || pw === data.password2) {
       sessionStorage.setItem('prof_auth', '1');

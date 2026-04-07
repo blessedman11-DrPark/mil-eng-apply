@@ -165,11 +165,37 @@
           <button class="btn btn-primary" id="run-assign-btn">배정 실행</button>
         </div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>학번</th><th>이름</th><th>1지망</th><th>2지망</th><th>3지망</th><th>제출일시</th></tr></thead>
-          <tbody id="tbody-status"></tbody>
-        </table>
+
+      <!-- 서브 탭 -->
+      <div style="display:flex;gap:.5rem;margin-bottom:1rem;border-bottom:2px solid #e2e8f0;padding-bottom:0">
+        <button class="sub-tab-btn active" data-subtab="by-student"
+          style="padding:.45rem 1rem;border:none;background:none;cursor:pointer;font-size:.9rem;font-weight:600;color:#4a7fff;border-bottom:2px solid #4a7fff;margin-bottom:-2px">
+          학생 신청 현황
+        </button>
+        <button class="sub-tab-btn" data-subtab="by-sentence"
+          style="padding:.45rem 1rem;border:none;background:none;cursor:pointer;font-size:.9rem;font-weight:600;color:#8896a5;border-bottom:2px solid transparent;margin-bottom:-2px">
+          문장별 신청 현황
+        </button>
+      </div>
+
+      <!-- 학생 신청 현황 -->
+      <div id="subtab-by-student">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>학번</th><th>이름</th><th>1지망</th><th>2지망</th><th>3지망</th></tr></thead>
+            <tbody id="tbody-status"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 문장별 신청 현황 -->
+      <div id="subtab-by-sentence" style="display:none">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>문장 번호</th><th>1지망 신청자</th><th>2지망 신청자</th><th>3지망 신청자</th></tr></thead>
+            <tbody id="tbody-sentence-status"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
