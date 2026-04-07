@@ -420,8 +420,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const n = i + 1;
         const st = map[n];
         return `<tr>
-          <td class="result-num">${n}</td>
-          <td>${st ? st.student_name : '<span class="text-muted">-</span>'}</td>
+          <td class="result-num" style="width:80px">${n}번</td>
+          <td style="text-align:left">${st ? `${st.student_id} &nbsp; ${st.student_name}` : '<span class="text-muted">-</span>'}</td>
         </tr>`;
       }).join('');
 
