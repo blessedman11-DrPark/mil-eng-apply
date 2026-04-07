@@ -19,7 +19,37 @@ async function runAssignment() {
     if (!currentRound) return { success: false, message: '먼저 새 회차를 시작해주세요.' };
 
     // ────────────────────────────────────────────────────────
-    // 4. 배정 알고리즘
+    // 4. 기존 배정 결과 초기화 (재배정 대비)
+    // ────────────────────────────────────────────────────────
+    await db.from(TABLES.SUBMISSIONS).update({ assigned_sentence: null }).neq('id', 0);
+    await db.from(TABLES.WIN_RECORDS).delete().eq('round_id', currentRound.id);
+
+    // win_history 재계산 (현재 회차 제외한 나머지 기록 기준)
+    const { data: remainingRecords } = await db.from(TABLES.WIN_RECORDS)
+      .select('student_id,student_name,won_at')
+      .order('won_at', { ascending: false });
+    const histMap = {};
+    (remainingRecords || []).forEach(r => {
+      if (!histMap[r.student_id]) {
+        histMap[r.student_id] = { student_name: r.student_name, win_count: 0, last_won_at: r.won_at };
+      }
+      histMap[r.student_id].win_count++;
+    });
+    await db.from(TABLES.WIN_HISTORY).delete().neq('student_id', '');
+    const rebuiltHistory = Object.entries(histMap).map(([sid, v]) => ({
+      student_id:   sid,
+      student_name: v.student_name,
+      win_count:    v.win_count,
+      last_won_at:  v.last_won_at,
+    }));
+    if (rebuiltHistory.length) {
+      await db.from(TABLES.WIN_HISTORY).insert(rebuiltHistory);
+    }
+
+    await db.from(TABLES.SETTINGS).update({ is_assigned: false }).eq('id', 1);
+
+    // ────────────────────────────────────────────────────────
+    // 5. 배정 알고리즘
     // assigned: { student_id → sentence_number }
     // takenSentences: 이미 배정된 문장 번호 Set
     // ────────────────────────────────────────────────────────
@@ -96,10 +126,10 @@ async function runAssignment() {
       queue = nextQueue;
     }
 
-    // 5. 모든 지망 탈락 학생 → 배정 없음 (탈락 처리)
+    // 6. 모든 지망 탈락 학생 → 배정 없음 (탈락 처리)
 
     // ────────────────────────────────────────────────────────
-    // 6. DB 업데이트
+    // 7. DB 업데이트
     // ────────────────────────────────────────────────────────
     const now = new Date();
     const wonMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
