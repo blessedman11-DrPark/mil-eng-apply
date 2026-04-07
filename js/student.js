@@ -28,8 +28,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── 초기 로드 ──────────────────────────────────────────────
   async function init() {
-    const { data: settings, error } = await db.from(TABLES.SETTINGS).select('*').single();
+    const [{ data: settings, error }, { data: rounds }] = await Promise.all([
+      db.from(TABLES.SETTINGS).select('*').single(),
+      db.from(TABLES.ROUNDS).select('round_number').order('round_number', { ascending: false }).limit(1),
+    ]);
     if (error || !settings) { show(closedEl); return; }
+
+    if (rounds?.[0]) {
+      document.getElementById('round-display').textContent = `(${rounds[0].round_number}회차)`;
+    }
 
     totalSentences = settings.total_sentences;
     document.getElementById('range-hint').textContent = `(1 ~ ${totalSentences})`;
