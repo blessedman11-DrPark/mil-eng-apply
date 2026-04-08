@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('status-count').textContent = data?.length || 0;
     if (!data?.length) { empty('tbody-status', 5, '제출된 데이터가 없습니다'); return; }
     tbody.innerHTML = data.map(s => `<tr>
-      <td>${s.student_id}</td><td>${s.student_name}</td>
+      <td style="white-space:nowrap">${s.student_id}</td><td style="white-space:nowrap">${s.student_name}</td>
       <td>${s.choice1 ?? '-'}</td><td>${s.choice2 ?? '-'}</td><td>${s.choice3 ?? '-'}</td>
     </tr>`).join('');
   }
