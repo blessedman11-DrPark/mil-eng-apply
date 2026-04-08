@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!data?.length) { empty('tbody-status', 5, '제출된 데이터가 없습니다'); return; }
     tbody.innerHTML = data.map(s => `<tr>
       <td style="white-space:nowrap">${s.student_id}</td><td style="white-space:nowrap">${s.student_name}</td>
-      <td>${s.choice1 ?? '-'}</td><td>${s.choice2 ?? '-'}</td><td>${s.choice3 ?? '-'}</td>
+      <td style="white-space:nowrap;padding-left:1.5rem">${s.choice1 ?? '-'}</td><td style="white-space:nowrap">${s.choice2 ?? '-'}</td><td style="white-space:nowrap">${s.choice3 ?? '-'}</td>
     </tr>`).join('');
   }
 
