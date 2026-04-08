@@ -312,10 +312,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       db.from(TABLES.WIN_RECORDS).delete().neq('id', 0),
       db.from(TABLES.ROUNDS).delete().neq('id', 0),
     ]);
-    await db.from(TABLES.ROUNDS).insert({ round_number: 1 });
     await db.from(TABLES.SETTINGS).update({ is_assigned: false, is_open: false }).eq('id', 1);
     await loadSettings();
-    showToast('전체 초기화 완료 (1회차)', 'success');
+    showToast('전체 초기화 완료', 'success');
   });
 
   // ════════════════════════════════════════════════════════════
