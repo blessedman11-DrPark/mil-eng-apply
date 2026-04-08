@@ -459,9 +459,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       empty('tbody-results-by-student', 3, '배정된 학생이 없습니다');
     } else {
       document.getElementById('tbody-results-by-student').innerHTML = assigned.map(st => `<tr>
-        <td>${st.student_id}</td>
-        <td>${st.student_name}</td>
-        <td style="text-align:center;font-weight:600">${st.assigned_sentence}번</td>
+        <td style="white-space:nowrap">${st.student_id}</td>
+        <td style="white-space:nowrap">${st.student_name}</td>
+        <td style="text-align:left;font-weight:600">${st.assigned_sentence}번</td>
       </tr>`).join('');
     }
 
