@@ -304,10 +304,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── 전체 초기화 ──
   document.getElementById('global-reset-btn').addEventListener('click', async () => {
-    const step1 = await showConfirm({ title: '전체 초기화', message: '전체 데이터를 초기화하시겠습니까? 이 작업은 되돌릴 수 없습니다.' });
-    if (!step1) return;
-    const step2 = await showConfirm({ title: '초기화 확인', message: '모든 데이터가 영구 삭제됩니다.', requireInput: true, inputExpected: '초기화' });
-    if (!step2) return;
+    const ok = await showConfirm({ title: '전체 초기화', message: '모든 데이터가 영구 삭제되고 1회차로 돌아갑니다. 계속하시겠습니까?' });
+    if (!ok) return;
     await Promise.all([
       db.from(TABLES.SUBMISSIONS).delete().neq('id', 0),
       db.from(TABLES.WIN_HISTORY).delete().neq('student_id', ''),
@@ -315,9 +313,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       db.from(TABLES.ROUNDS).delete().neq('id', 0),
     ]);
     await db.from(TABLES.ROUNDS).insert({ round_number: 1 });
-    await db.from(TABLES.SETTINGS).update({ is_assigned: false }).eq('id', 1);
+    await db.from(TABLES.SETTINGS).update({ is_assigned: false, is_open: false }).eq('id', 1);
     await loadSettings();
-    showToast('전체 초기화 완료 (1회차로 초기화)', 'success');
+    showToast('전체 초기화 완료 (1회차)', 'success');
   });
 
   // ════════════════════════════════════════════════════════════
