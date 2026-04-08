@@ -416,14 +416,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ════════════════════════════════════════════════════════════
   // 탭3: 배정 결과
   // ════════════════════════════════════════════════════════════
+
+  // 결과 서브 탭 전환
+  document.querySelectorAll('.result-sub-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.result-sub-tab-btn').forEach(b => {
+        b.style.color = '#8896a5';
+        b.style.borderBottomColor = 'transparent';
+      });
+      btn.style.color = '#4a7fff';
+      btn.style.borderBottomColor = '#4a7fff';
+      const target = btn.dataset.resultSubtab;
+      document.getElementById('result-subtab-by-sentence').style.display = target === 'by-sentence' ? '' : 'none';
+      document.getElementById('result-subtab-by-student').style.display = target === 'by-student' ? '' : 'none';
+    });
+  });
+
   async function loadResults() {
     const { data: s } = await db.from(TABLES.SETTINGS).select('total_sentences').single();
     const total = s?.total_sentences || 20;
     const { data: subs } = await db.from(TABLES.SUBMISSIONS).select('student_id,student_name,assigned_sentence');
+
+    // 문장번호 → 학생 맵
     const map = {};
     (subs || []).forEach(s => { if (s.assigned_sentence) map[s.assigned_sentence] = s; });
 
-    document.getElementById('tbody-results').innerHTML =
+    // 문장번호순
+    document.getElementById('tbody-results-by-sentence').innerHTML =
       Array.from({ length: total }, (_, i) => {
         const n = i + 1;
         const st = map[n];
@@ -432,6 +451,19 @@ document.addEventListener('DOMContentLoaded', async () => {
           <td style="text-align:left">${st ? `${st.student_id} &nbsp; ${st.student_name}` : '<span class="text-muted">-</span>'}</td>
         </tr>`;
       }).join('');
+
+    // 학번순 (배정된 학생만, 학번 오름차순)
+    const assigned = (subs || []).filter(s => s.assigned_sentence)
+      .sort((a, b) => a.student_id.localeCompare(b.student_id));
+    if (!assigned.length) {
+      empty('tbody-results-by-student', 3, '배정된 학생이 없습니다');
+    } else {
+      document.getElementById('tbody-results-by-student').innerHTML = assigned.map(st => `<tr>
+        <td>${st.student_id}</td>
+        <td>${st.student_name}</td>
+        <td style="text-align:center;font-weight:600">${st.assigned_sentence}번</td>
+      </tr>`).join('');
+    }
 
     document.getElementById('csv-btn').onclick = () => downloadCSV(total, map);
   }

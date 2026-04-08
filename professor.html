@@ -207,11 +207,37 @@
         <h2 style="margin:0">배정 결과</h2>
         <button class="btn btn-secondary btn-sm" id="csv-btn">📥 CSV 다운로드</button>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>문장 번호</th><th style="text-align:left">학번 / 이름</th></tr></thead>
-          <tbody id="tbody-results"></tbody>
-        </table>
+
+      <!-- 서브 탭 -->
+      <div style="display:flex;gap:.5rem;margin-bottom:1rem;border-bottom:2px solid #e2e8f0;padding-bottom:0">
+        <button class="result-sub-tab-btn active" data-result-subtab="by-sentence"
+          style="padding:.45rem 1rem;border:none;background:none;cursor:pointer;font-size:.9rem;font-weight:600;color:#4a7fff;border-bottom:2px solid #4a7fff;margin-bottom:-2px">
+          문장번호순
+        </button>
+        <button class="result-sub-tab-btn" data-result-subtab="by-student"
+          style="padding:.45rem 1rem;border:none;background:none;cursor:pointer;font-size:.9rem;font-weight:600;color:#8896a5;border-bottom:2px solid transparent;margin-bottom:-2px">
+          학번순
+        </button>
+      </div>
+
+      <!-- 문장번호순 -->
+      <div id="result-subtab-by-sentence">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>문장 번호</th><th style="text-align:left">학번 / 이름</th></tr></thead>
+            <tbody id="tbody-results-by-sentence"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 학번순 -->
+      <div id="result-subtab-by-student" style="display:none">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>학번</th><th>이름</th><th>배정 문장</th></tr></thead>
+            <tbody id="tbody-results-by-student"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
