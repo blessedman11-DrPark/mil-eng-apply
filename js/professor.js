@@ -462,6 +462,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       </tr>`).join('');
     }
 
+    // 탈락자 (신청했으나 배정 안 됨)
+    const unassigned = (subs || []).filter(s => !s.assigned_sentence)
+      .sort((a, b) => a.student_id.localeCompare(b.student_id));
+    const unassignedSection = document.getElementById('unassigned-section');
+    if (unassigned.length) {
+      document.getElementById('unassigned-count').textContent = `(${unassigned.length}명)`;
+      document.getElementById('tbody-unassigned').innerHTML = unassigned.map(st => `<tr>
+        <td style="white-space:nowrap">${st.student_id}</td>
+        <td style="white-space:nowrap">${st.student_name}</td>
+      </tr>`).join('');
+      unassignedSection.style.display = '';
+    } else {
+      unassignedSection.style.display = 'none';
+    }
+
     document.getElementById('csv-btn').onclick = () => downloadCSV(total, map);
   }
 
