@@ -469,8 +469,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (unassigned.length) {
       document.getElementById('unassigned-count').textContent = `(${unassigned.length}명)`;
       document.getElementById('tbody-unassigned').innerHTML = unassigned.map(st => `<tr>
-        <td style="white-space:nowrap">${st.student_id}</td>
-        <td style="white-space:nowrap">${st.student_name}</td>
+        <td style="white-space:nowrap;padding-right:.5rem">${st.student_id}</td>
+        <td style="white-space:nowrap;padding-left:.5rem">${st.student_name}</td>
       </tr>`).join('');
       unassignedSection.style.display = '';
     } else {
