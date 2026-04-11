@@ -80,8 +80,6 @@
     const { data, error } = await db.from(TABLES.SETTINGS).select('password1,password2').maybeSingle();
     document.getElementById('pw-confirm').disabled = false;
 
-    console.log('[교수인증] data:', data, '/ error:', error);
-
     if (error) {
       pwError.textContent = `DB 오류: ${error.message} (code: ${error.code})`;
       pwError.classList.remove('hidden');
@@ -93,10 +91,9 @@
       return;
     }
 
-    console.log('[교수인증] password1:', JSON.stringify(data.password1), '/ password2:', JSON.stringify(data.password2), '/ 입력값:', JSON.stringify(pw));
-
     if (pw === data.password1 || pw === data.password2) {
-      sessionStorage.setItem('prof_auth', '1');
+      // 만료 시각(30분 후)을 함께 저장
+      sessionStorage.setItem('prof_auth', String(Date.now() + 30 * 60 * 1000));
       location.href = 'professor.html';
     } else {
       pwError.textContent = '비밀번호가 올바르지 않습니다.';

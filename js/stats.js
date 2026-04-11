@@ -111,9 +111,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ── 순위 테이블 ──
     document.getElementById('tbody-rank').innerHTML = wh.map((h, i) => `<tr>
       <td>${i + 1}</td>
-      <td>${h.student_id}</td>
-      <td>${h.student_name}</td>
-      <td>${h.win_count}</td>
+      <td>${escHtml(h.student_id)}</td>
+      <td>${escHtml(h.student_name)}</td>
+      <td>${escHtml(h.win_count)}</td>
       <td>${fmtDate(h.last_won_at)}</td>
     </tr>`).join('');
 
@@ -153,9 +153,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const countMap = {};
       (wr || []).forEach(r => { countMap[r.round_id] = (countMap[r.round_id] || 0) + 1; });
       document.getElementById('tbody-rounds-summary').innerHTML = rounds.map(r => `<tr>
-        <td>${r.round_number}회차</td>
+        <td>${escHtml(r.round_number)}회차</td>
         <td>${fmtDate(r.executed_at)}</td>
-        <td>${countMap[r.id] || 0}명</td>
+        <td>${escHtml(countMap[r.id] || 0)}명</td>
       </tr>`).join('');
     }
 
@@ -175,8 +175,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (!records?.length) { empty('tbody-round-detail', 4); return; }
       document.getElementById('tbody-round-detail').innerHTML = records.map(r => `<tr>
-        <td>${r.student_id}</td><td>${r.student_name}</td>
-        <td>${r.assigned_sentence}번</td><td>${fmt(r.won_at)}</td>
+        <td>${escHtml(r.student_id)}</td><td>${escHtml(r.student_name)}</td>
+        <td>${escHtml(r.assigned_sentence)}번</td><td>${fmt(r.won_at)}</td>
       </tr>`).join('');
     });
   }

@@ -14,6 +14,17 @@ function initSupabase() {
   return true;
 }
 
+// HTML 특수문자 이스케이프 (XSS 방지)
+function escHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // 테이블 이름 상수
 const TABLES = {
   SETTINGS:    'settings',

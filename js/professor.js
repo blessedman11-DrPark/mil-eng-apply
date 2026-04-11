@@ -1,7 +1,9 @@
 // professor.js
 
 document.addEventListener('DOMContentLoaded', async () => {
-  if (!sessionStorage.getItem('prof_auth')) {
+  const authExpiry = parseInt(sessionStorage.getItem('prof_auth') || '0', 10);
+  if (!authExpiry || Date.now() > authExpiry) {
+    sessionStorage.removeItem('prof_auth');
     location.href = 'mil_eng_apply.html';
     return;
   }
@@ -161,9 +163,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tbody = document.getElementById('tbody-submissions');
     if (!data?.length) { empty('tbody-submissions', 7); return; }
     tbody.innerHTML = data.map(s => `<tr>
-      <td><input type="checkbox" class="row-check sub-ck" data-id="${s.id}"/></td>
-      <td>${s.student_id}</td><td>${s.student_name}</td>
-      <td>${s.choice1 ?? '-'}</td><td>${s.choice2 ?? '-'}</td><td>${s.choice3 ?? '-'}</td>
+      <td><input type="checkbox" class="row-check sub-ck" data-id="${escHtml(s.id)}"/></td>
+      <td>${escHtml(s.student_id)}</td><td>${escHtml(s.student_name)}</td>
+      <td>${escHtml(s.choice1 ?? '-')}</td><td>${escHtml(s.choice2 ?? '-')}</td><td>${escHtml(s.choice3 ?? '-')}</td>
       <td>${fmt(s.created_at)}</td>
     </tr>`).join('');
     bindCheckAll('chk-all-sub', '.sub-ck');
@@ -193,9 +195,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data } = await db.from(TABLES.WIN_HISTORY).select('*').order('win_count', { ascending: false });
     if (!data?.length) { empty('tbody-win-history', 5); return; }
     document.getElementById('tbody-win-history').innerHTML = data.map(h => `<tr>
-      <td><input type="checkbox" class="row-check wh-ck" data-id="${h.student_id}"/></td>
-      <td>${h.student_id}</td><td>${h.student_name}</td>
-      <td>${h.win_count}</td><td>${fmtDate(h.last_won_at)}</td>
+      <td><input type="checkbox" class="row-check wh-ck" data-id="${escHtml(h.student_id)}"/></td>
+      <td>${escHtml(h.student_id)}</td><td>${escHtml(h.student_name)}</td>
+      <td>${escHtml(h.win_count)}</td><td>${fmtDate(h.last_won_at)}</td>
     </tr>`).join('');
     bindCheckAll('chk-all-wh', '.wh-ck');
   }
@@ -236,9 +238,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   function renderWrTable(records) {
     if (!records.length) { empty('tbody-win-records', 6); return; }
     document.getElementById('tbody-win-records').innerHTML = records.map(r => `<tr>
-      <td><input type="checkbox" class="row-check wr-ck" data-id="${r.id}"/></td>
-      <td>${r.round_number}회차</td><td>${r.student_id}</td><td>${r.student_name}</td>
-      <td>${r.assigned_sentence}번</td><td>${fmt(r.won_at)}</td>
+      <td><input type="checkbox" class="row-check wr-ck" data-id="${escHtml(r.id)}"/></td>
+      <td>${escHtml(r.round_number)}회차</td><td>${escHtml(r.student_id)}</td><td>${escHtml(r.student_name)}</td>
+      <td>${escHtml(r.assigned_sentence)}번</td><td>${fmt(r.won_at)}</td>
     </tr>`).join('');
     bindCheckAll('chk-all-wr', '.wr-ck');
   }
@@ -277,8 +279,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data } = await db.from(TABLES.ROUNDS).select('*').order('round_number', { ascending: false });
     if (!data?.length) { empty('tbody-rounds', 3); return; }
     document.getElementById('tbody-rounds').innerHTML = data.map(r => `<tr>
-      <td><input type="checkbox" class="row-check rd-ck" data-id="${r.id}"/></td>
-      <td>${r.round_number}회차</td><td>${fmt(r.executed_at)}</td>
+      <td><input type="checkbox" class="row-check rd-ck" data-id="${escHtml(r.id)}"/></td>
+      <td>${escHtml(r.round_number)}회차</td><td>${fmt(r.executed_at)}</td>
     </tr>`).join('');
     bindCheckAll('chk-all-rd', '.rd-ck');
   }
@@ -343,8 +345,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('status-count').textContent = data?.length || 0;
     if (!data?.length) { empty('tbody-status', 5, '제출된 데이터가 없습니다'); return; }
     tbody.innerHTML = data.map(s => `<tr>
-      <td style="white-space:nowrap">${s.student_id}</td><td style="white-space:nowrap">${s.student_name}</td>
-      <td style="white-space:nowrap;padding-left:1.5rem">${s.choice1 ?? '-'}</td><td style="white-space:nowrap">${s.choice2 ?? '-'}</td><td style="white-space:nowrap">${s.choice3 ?? '-'}</td>
+      <td style="white-space:nowrap">${escHtml(s.student_id)}</td><td style="white-space:nowrap">${escHtml(s.student_name)}</td>
+      <td style="white-space:nowrap;padding-left:1.5rem">${escHtml(s.choice1 ?? '-')}</td><td style="white-space:nowrap">${escHtml(s.choice2 ?? '-')}</td><td style="white-space:nowrap">${escHtml(s.choice3 ?? '-')}</td>
     </tr>`).join('');
   }
 
@@ -373,9 +375,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       const totalCell = total_applicants > 0
         ? `<span style="font-weight:600">${total_applicants}명</span> <span style="color:#8896a5;font-size:.85em">(${cnt1}, ${cnt2}, ${cnt3})</span>`
         : '<span class="text-muted">-</span>';
-      const c1 = byChoice1[n]?.join(', ') || '<span class="text-muted">-</span>';
-      const c2 = byChoice2[n]?.join(', ') || '<span class="text-muted">-</span>';
-      const c3 = byChoice3[n]?.join(', ') || '<span class="text-muted">-</span>';
+      const c1 = byChoice1[n]?.map(escHtml).join(', ') || '<span class="text-muted">-</span>';
+      const c2 = byChoice2[n]?.map(escHtml).join(', ') || '<span class="text-muted">-</span>';
+      const c3 = byChoice3[n]?.map(escHtml).join(', ') || '<span class="text-muted">-</span>';
       return `<tr><td style="text-align:center;font-weight:600">${n}번</td><td style="white-space:nowrap">${totalCell}</td><td>${c1}</td><td>${c2}</td><td>${c3}</td></tr>`;
     }).join('');
   }
@@ -445,7 +447,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const st = map[n];
         return `<tr>
           <td class="result-num" style="width:80px">${n}번</td>
-          <td style="text-align:left">${st ? `${st.student_id} &nbsp; ${st.student_name}` : '<span class="text-muted">-</span>'}</td>
+          <td style="text-align:left">${st ? `${escHtml(st.student_id)} &nbsp; ${escHtml(st.student_name)}` : '<span class="text-muted">-</span>'}</td>
         </tr>`;
       }).join('');
 
@@ -456,9 +458,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       empty('tbody-results-by-student', 3, '배정된 학생이 없습니다');
     } else {
       document.getElementById('tbody-results-by-student').innerHTML = assigned.map(st => `<tr>
-        <td style="white-space:nowrap">${st.student_id}</td>
-        <td style="white-space:nowrap">${st.student_name}</td>
-        <td style="text-align:left;font-weight:600">${st.assigned_sentence}번</td>
+        <td style="white-space:nowrap">${escHtml(st.student_id)}</td>
+        <td style="white-space:nowrap">${escHtml(st.student_name)}</td>
+        <td style="text-align:left;font-weight:600">${escHtml(st.assigned_sentence)}번</td>
       </tr>`).join('');
     }
 
@@ -469,8 +471,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (unassigned.length) {
       document.getElementById('unassigned-count').textContent = `(${unassigned.length}명)`;
       document.getElementById('tbody-unassigned').innerHTML = unassigned.map(st => `<tr>
-        <td style="white-space:nowrap;padding-right:.5rem">${st.student_id}</td>
-        <td style="white-space:nowrap;padding-left:.5rem">${st.student_name}</td>
+        <td style="white-space:nowrap;padding-right:.5rem">${escHtml(st.student_id)}</td>
+        <td style="white-space:nowrap;padding-left:.5rem">${escHtml(st.student_name)}</td>
       </tr>`).join('');
       unassignedSection.style.display = '';
     } else {
@@ -506,15 +508,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 학생별 누계
     if (!wh?.length) { empty('stats-tbody-wh', 5); }
     else document.getElementById('stats-tbody-wh').innerHTML = wh.map((h, i) => `<tr>
-      <td>${i + 1}</td><td>${h.student_id}</td><td>${h.student_name}</td>
-      <td>${h.win_count}</td><td>${fmtDate(h.last_won_at)}</td>
+      <td>${i + 1}</td><td>${escHtml(h.student_id)}</td><td>${escHtml(h.student_name)}</td>
+      <td>${escHtml(h.win_count)}</td><td>${fmtDate(h.last_won_at)}</td>
     </tr>`).join('');
 
     // 회차별 기록
     if (!wr?.length) { empty('stats-tbody-wr', 5); }
     else document.getElementById('stats-tbody-wr').innerHTML = wr.map(r => `<tr>
-      <td>${r.round_number}회차</td><td>${r.student_id}</td><td>${r.student_name}</td>
-      <td>${r.assigned_sentence}번</td><td>${fmt(r.won_at)}</td>
+      <td>${escHtml(r.round_number)}회차</td><td>${escHtml(r.student_id)}</td><td>${escHtml(r.student_name)}</td>
+      <td>${escHtml(r.assigned_sentence)}번</td><td>${fmt(r.won_at)}</td>
     </tr>`).join('');
 
     // 문장별 빈도

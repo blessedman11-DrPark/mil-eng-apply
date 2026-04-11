@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 완료 화면
-    document.getElementById('done-name').textContent = `${name} (${sid})`;
+    document.getElementById('done-name').textContent = `${name} (${sid})`;  // textContent는 안전
     document.getElementById('done-choices').innerHTML =
       `1지망: <strong>${c1}번</strong>` +
       (c2 ? ` &nbsp;/&nbsp; 2지망: <strong>${c2}번</strong>` : '') +
@@ -160,14 +160,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const content = document.getElementById('result-content');
     if (data.assigned_sentence) {
       content.innerHTML = `
-        <p style="margin-bottom:.75rem">${name} (${sid}) 학생의 배정 결과입니다.</p>
+        <p style="margin-bottom:.75rem">${escHtml(name)} (${escHtml(sid)}) 학생의 배정 결과입니다.</p>
         <div style="background:#e8f0ff;border-radius:8px;padding:1.25rem;text-align:center">
-          <div style="font-size:2rem;font-weight:700;color:#4a7fff">${data.assigned_sentence}번</div>
+          <div style="font-size:2rem;font-weight:700;color:#4a7fff">${escHtml(data.assigned_sentence)}번</div>
           <div style="color:#555;margin-top:.4rem">배정 완료</div>
         </div>`;
     } else {
       content.innerHTML = `
-        <p style="margin-bottom:.75rem">${name} (${sid}) 학생의 신청 내역이 확인되었습니다.</p>
+        <p style="margin-bottom:.75rem">${escHtml(name)} (${escHtml(sid)}) 학생의 신청 내역이 확인되었습니다.</p>
         <div class="msg msg-warn">배정이 아직 완료되지 않았습니다.</div>`;
     }
     show(resultEl);
