@@ -1,0 +1,18 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - heading "🎖️ 군사영어 문장 선택 시스템" [level=1] [ref=e3]
+    - generic [ref=e4]: 건양대학교
+  - main [ref=e5]:
+    - generic [ref=e6]:
+      - button "👨‍🏫 교수 대시보드 접속" [ref=e7] [cursor=pointer]:
+        - generic [ref=e8]: 👨‍🏫
+        - heading "교수" [level=2] [ref=e9]
+        - paragraph [ref=e10]: 대시보드 접속
+      - button "📝 학생 문장 신청하기" [ref=e11] [cursor=pointer]:
+        - generic [ref=e12]: 📝
+        - heading "학생" [level=2] [ref=e13]
+        - paragraph [ref=e14]: 문장 신청하기
+      - button "📊 통계 보기 배정 현황 확인" [ref=e15] [cursor=pointer]:
+        - generic [ref=e16]: 📊
+        - heading "통계 보기" [level=2] [ref=e17]
+        - paragraph [ref=e18]: 배정 현황 확인

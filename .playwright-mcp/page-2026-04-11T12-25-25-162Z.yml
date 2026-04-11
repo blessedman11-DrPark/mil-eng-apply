@@ -1,0 +1,7 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - link "← 메인" [ref=e3] [cursor=pointer]:
+      - /url: mil_eng_apply.html
+    - heading "문장 신청" [level=1] [ref=e4]: 문장 신청
+  - main [ref=e5]:
+    - paragraph [ref=e7]: 불러오는 중...
