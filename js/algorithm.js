@@ -132,7 +132,9 @@ async function runAssignment() {
     // 7. DB 업데이트
     // ────────────────────────────────────────────────────────
     const now = new Date();
-    const wonMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    // KST(UTC+9) 기준 날짜·월 계산
+    const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    const wonMonth = `${kst.getUTCFullYear()}-${String(kst.getUTCMonth() + 1).padStart(2, '0')}`;
 
     // 6a. submissions.assigned_sentence 업데이트 (순차)
     for (const s of submissions) {
@@ -168,7 +170,7 @@ async function runAssignment() {
       student_name:      s.student_name,
       assigned_sentence: assigned[s.student_id],
       won_at:            now.toISOString(),
-      won_date:          now.toISOString().split('T')[0],
+      won_date:          kst.toISOString().split('T')[0],
       won_month:         wonMonth,
     }));
     if (winRecordRows.length) {

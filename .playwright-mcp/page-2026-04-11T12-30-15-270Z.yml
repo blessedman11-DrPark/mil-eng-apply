@@ -1,0 +1,23 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - link "← 메인" [ref=e3] [cursor=pointer]:
+      - /url: mil_eng_apply.html
+    - heading "배정 현황 통계" [level=1] [ref=e4]
+    - button "🔄 새로고침" [ref=e5] [cursor=pointer]
+  - main [ref=e6]:
+    - generic [ref=e7]:
+      - button "학생별 현황" [ref=e8] [cursor=pointer]
+      - button "회차별 기록" [ref=e9] [cursor=pointer]
+    - generic [ref=e10]:
+      - heading "학생별 누계 당첨 횟수" [level=2] [ref=e12]
+      - generic [ref=e16]:
+        - heading "당첨 순위" [level=2] [ref=e17]
+        - table [ref=e19]:
+          - rowgroup [ref=e20]:
+            - row "순위 학번 이름 당첨 횟수 마지막 당첨일" [ref=e21]:
+              - columnheader "순위" [ref=e22]
+              - columnheader "학번" [ref=e23]
+              - columnheader "이름" [ref=e24]
+              - columnheader "당첨 횟수" [ref=e25]
+              - columnheader "마지막 당첨일" [ref=e26]
+          - rowgroup
