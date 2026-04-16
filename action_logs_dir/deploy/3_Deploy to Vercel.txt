@@ -1,0 +1,71 @@
+﻿2026-04-16T12:54:45.2952918Z ##[group]Run amondnet/vercel-action@v25
+2026-04-16T12:54:45.2954167Z with:
+2026-04-16T12:54:45.2955975Z   vercel-token: ***
+2026-04-16T12:54:45.2957051Z   vercel-org-id: ***
+2026-04-16T12:54:45.2958197Z   vercel-project-id: ***
+2026-04-16T12:54:45.2959227Z   vercel-args: --prod
+2026-04-16T12:54:45.2960171Z   github-comment: true
+2026-04-16T12:54:45.2961138Z   github-deployment: false
+2026-04-16T12:54:45.2962125Z ##[endgroup]
+2026-04-16T12:54:45.3877706Z set environment for vercel cli
+2026-04-16T12:54:45.3885179Z set env variable : VERCEL_ORG_ID
+2026-04-16T12:54:45.3886648Z set env variable : VERCEL_PROJECT_ID
+2026-04-16T12:54:45.3992114Z [command]/usr/local/bin/npx vercel@25.1.0 --prod -t *** -m githubCommitSha=c63e86501138f111e7d8d275174f195300d3e3ba -m githubCommitAuthorName=blessedman11-DrPark -m githubCommitAuthorLogin=blessedman11-DrPark -m githubDeployment=1 -m githubOrg=blessedman11-DrPark -m githubRepo=mil-eng-apply -m githubCommitOrg=blessedman11-DrPark -m githubCommitRepo=mil-eng-apply -m githubCommitMessage="auto: Claude 코드 수정" -m githubCommitRef=main
+2026-04-16T12:54:52.7809151Z npm warn exec The following package was not found and will be installed: vercel@25.1.0
+2026-04-16T12:54:52.7811343Z 
+2026-04-16T12:54:52.7811856Z npm warn exec The following package was not found and will be installed: vercel@25.1.0
+2026-04-16T12:54:58.9381413Z npm warn deprecated osenv@0.1.5: This package is no longer supported.
+2026-04-16T12:54:58.9382010Z 
+2026-04-16T12:54:58.9382297Z npm warn deprecated osenv@0.1.5: This package is no longer supported.
+2026-04-16T12:54:59.5938951Z npm warn deprecated are-we-there-yet@2.0.0: This package is no longer supported.
+2026-04-16T12:54:59.5940256Z 
+2026-04-16T12:54:59.5941265Z npm warn deprecated are-we-there-yet@2.0.0: This package is no longer supported.
+2026-04-16T12:54:59.6750250Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2026-04-16T12:54:59.6752228Z 
+2026-04-16T12:54:59.6754228Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2026-04-16T12:54:59.7141572Z npm warn deprecated npmlog@5.0.1: This package is no longer supported.
+2026-04-16T12:54:59.7142555Z 
+2026-04-16T12:54:59.7143657Z npm warn deprecated npmlog@5.0.1: This package is no longer supported.
+2026-04-16T12:54:59.7558434Z npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-04-16T12:54:59.7560054Z 
+2026-04-16T12:54:59.7562275Z npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-04-16T12:54:59.7685741Z npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+2026-04-16T12:54:59.7686854Z 
+2026-04-16T12:54:59.7687345Z npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+2026-04-16T12:54:59.7944590Z npm warn deprecated gauge@3.0.2: This package is no longer supported.
+2026-04-16T12:54:59.7945595Z 
+2026-04-16T12:54:59.7946069Z npm warn deprecated gauge@3.0.2: This package is no longer supported.
+2026-04-16T12:54:59.8742577Z npm warn deprecated are-we-there-yet@1.1.7: This package is no longer supported.
+2026-04-16T12:54:59.8744133Z 
+2026-04-16T12:54:59.8745383Z npm warn deprecated are-we-there-yet@1.1.7: This package is no longer supported.
+2026-04-16T12:54:59.8945046Z npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
+2026-04-16T12:54:59.8948108Z 
+2026-04-16T12:54:59.8948991Z npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
+2026-04-16T12:54:59.9068169Z npm warn deprecated npmlog@4.1.2: This package is no longer supported.
+2026-04-16T12:54:59.9068936Z 
+2026-04-16T12:54:59.9069316Z npm warn deprecated npmlog@4.1.2: This package is no longer supported.
+2026-04-16T12:54:59.9849651Z npm warn deprecated gauge@2.7.4: This package is no longer supported.
+2026-04-16T12:54:59.9851150Z 
+2026-04-16T12:54:59.9852046Z npm warn deprecated gauge@2.7.4: This package is no longer supported.
+2026-04-16T12:55:00.0411281Z npm warn deprecated tar@6.2.1: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-04-16T12:55:00.0412399Z 
+2026-04-16T12:55:00.0413370Z npm warn deprecated tar@6.2.1: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-04-16T12:55:00.0743519Z npm warn deprecated node-pre-gyp@0.13.0: Please upgrade to @mapbox/node-pre-gyp: the non-scoped node-pre-gyp package is deprecated and only the @mapbox scoped package will recieve updates in the future
+2026-04-16T12:55:00.0744848Z 
+2026-04-16T12:55:00.0746240Z npm warn deprecated node-pre-gyp@0.13.0: Please upgrade to @mapbox/node-pre-gyp: the non-scoped node-pre-gyp package is deprecated and only the @mapbox scoped package will recieve updates in the future
+2026-04-16T12:55:00.1176850Z npm warn deprecated tar@4.4.19: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-04-16T12:55:00.1178905Z 
+2026-04-16T12:55:00.1180262Z npm warn deprecated tar@4.4.19: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-04-16T12:55:02.5551061Z Vercel CLI 25.1.0
+2026-04-16T12:55:02.5551338Z 
+2026-04-16T12:55:02.5551459Z Vercel CLI 25.1.0
+2026-04-16T12:55:02.5771274Z Retrieving project…
+2026-04-16T12:55:02.5771822Z 
+2026-04-16T12:55:02.5772294Z Retrieving project…
+2026-04-16T12:55:02.9462274Z Deploying dr-parks-projects/mil-eng-apply
+2026-04-16T12:55:02.9462693Z 
+2026-04-16T12:55:02.9462878Z Deploying dr-parks-projects/mil-eng-apply
+2026-04-16T12:55:03.4003704Z Error! Your Vercel CLI version is outdated. This endpoint requires version 47.2.2 or later. Please upgrade by running `npm i -g vercel@latest`.
+2026-04-16T12:55:03.4004681Z 
+2026-04-16T12:55:03.4005671Z Error! Your Vercel CLI version is outdated. This endpoint requires version 47.2.2 or later. Please upgrade by running `npm i -g vercel@latest`.
+2026-04-16T12:55:03.5008696Z ##[error]The process '/usr/local/bin/npx' failed with exit code 1

@@ -1,0 +1,261 @@
+﻿2026-04-16T12:54:43.6204085Z Current runner version: '2.333.1'
+2026-04-16T12:54:43.6232177Z ##[group]Runner Image Provisioner
+2026-04-16T12:54:43.6233224Z Hosted Compute Agent
+2026-04-16T12:54:43.6233864Z Version: 20260213.493
+2026-04-16T12:54:43.6234553Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+2026-04-16T12:54:43.6235644Z Build Date: 2026-02-13T00:28:41Z
+2026-04-16T12:54:43.6236453Z Worker ID: {6559d60e-a20b-4685-b965-d1a6847b5a47}
+2026-04-16T12:54:43.6237236Z Azure Region: northcentralus
+2026-04-16T12:54:43.6237882Z ##[endgroup]
+2026-04-16T12:54:43.6239918Z ##[group]Operating System
+2026-04-16T12:54:43.6240642Z Ubuntu
+2026-04-16T12:54:43.6241169Z 24.04.4
+2026-04-16T12:54:43.6241658Z LTS
+2026-04-16T12:54:43.6242181Z ##[endgroup]
+2026-04-16T12:54:43.6242726Z ##[group]Runner Image
+2026-04-16T12:54:43.6243294Z Image: ubuntu-24.04
+2026-04-16T12:54:43.6243879Z Version: 20260406.80.1
+2026-04-16T12:54:43.6245388Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260406.80/images/ubuntu/Ubuntu2404-Readme.md
+2026-04-16T12:54:43.6247122Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260406.80
+2026-04-16T12:54:43.6248048Z ##[endgroup]
+2026-04-16T12:54:43.6249278Z ##[group]GITHUB_TOKEN Permissions
+2026-04-16T12:54:43.6251664Z Contents: read
+2026-04-16T12:54:43.6252261Z Metadata: read
+2026-04-16T12:54:43.6252957Z Packages: read
+2026-04-16T12:54:43.6253571Z ##[endgroup]
+2026-04-16T12:54:43.6256434Z Secret source: Actions
+2026-04-16T12:54:43.6257554Z Prepare workflow directory
+2026-04-16T12:54:43.6621502Z Prepare all required actions
+2026-04-16T12:54:43.6659720Z Getting action download info
+2026-04-16T12:54:44.0582176Z Download action repository 'actions/checkout@v3' (SHA:f43a0e5ff2bd294095638e18286ca9a3d1956744)
+2026-04-16T12:54:44.2367979Z Download action repository 'amondnet/vercel-action@v25' (SHA:16e87c0a08142b0d0d33b76aeaf20823c381b9b9)
+2026-04-16T12:54:44.7129901Z Complete job name: deploy
+2026-04-16T12:54:44.7859491Z ##[group]Run actions/checkout@v3
+2026-04-16T12:54:44.7860635Z with:
+2026-04-16T12:54:44.7861264Z   repository: blessedman11-DrPark/mil-eng-apply
+2026-04-16T12:54:44.7862162Z   token: ***
+2026-04-16T12:54:44.7862603Z   ssh-strict: true
+2026-04-16T12:54:44.7863092Z   persist-credentials: true
+2026-04-16T12:54:44.7863607Z   clean: true
+2026-04-16T12:54:44.7864070Z   sparse-checkout-cone-mode: true
+2026-04-16T12:54:44.7864628Z   fetch-depth: 1
+2026-04-16T12:54:44.7865088Z   fetch-tags: false
+2026-04-16T12:54:44.7865765Z   lfs: false
+2026-04-16T12:54:44.7866214Z   submodules: false
+2026-04-16T12:54:44.7866691Z   set-safe-directory: true
+2026-04-16T12:54:44.7867482Z ##[endgroup]
+2026-04-16T12:54:44.8742881Z Syncing repository: blessedman11-DrPark/mil-eng-apply
+2026-04-16T12:54:44.8744843Z ##[group]Getting Git version info
+2026-04-16T12:54:44.8746102Z Working directory is '/home/runner/work/mil-eng-apply/mil-eng-apply'
+2026-04-16T12:54:44.8747281Z [command]/usr/bin/git version
+2026-04-16T12:54:44.8787148Z git version 2.53.0
+2026-04-16T12:54:44.8815519Z ##[endgroup]
+2026-04-16T12:54:44.8832494Z Temporarily overriding HOME='/home/runner/work/_temp/74eaea7c-a246-4083-98ea-38dd021a6403' before making global git config changes
+2026-04-16T12:54:44.8835583Z Adding repository directory to the temporary git global config as a safe directory
+2026-04-16T12:54:44.8838171Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mil-eng-apply/mil-eng-apply
+2026-04-16T12:54:44.8870252Z Deleting the contents of '/home/runner/work/mil-eng-apply/mil-eng-apply'
+2026-04-16T12:54:44.8873817Z ##[group]Initializing the repository
+2026-04-16T12:54:44.8878238Z [command]/usr/bin/git init /home/runner/work/mil-eng-apply/mil-eng-apply
+2026-04-16T12:54:44.8958136Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-04-16T12:54:44.8960298Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-04-16T12:54:44.8962331Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-04-16T12:54:44.8963899Z hint: call:
+2026-04-16T12:54:44.8965361Z hint:
+2026-04-16T12:54:44.8966632Z hint: 	git config --global init.defaultBranch <name>
+2026-04-16T12:54:44.8967801Z hint:
+2026-04-16T12:54:44.8968881Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-04-16T12:54:44.8970780Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-04-16T12:54:44.8972241Z hint:
+2026-04-16T12:54:44.8972973Z hint: 	git branch -m <name>
+2026-04-16T12:54:44.8973807Z hint:
+2026-04-16T12:54:44.8975118Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-04-16T12:54:44.8976800Z Initialized empty Git repository in /home/runner/work/mil-eng-apply/mil-eng-apply/.git/
+2026-04-16T12:54:44.8978710Z [command]/usr/bin/git remote add origin https://github.com/blessedman11-DrPark/mil-eng-apply
+2026-04-16T12:54:44.9001100Z ##[endgroup]
+2026-04-16T12:54:44.9002559Z ##[group]Disabling automatic garbage collection
+2026-04-16T12:54:44.9004044Z [command]/usr/bin/git config --local gc.auto 0
+2026-04-16T12:54:44.9032207Z ##[endgroup]
+2026-04-16T12:54:44.9033624Z ##[group]Setting up auth
+2026-04-16T12:54:44.9038744Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-04-16T12:54:44.9067970Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-04-16T12:54:44.9358821Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-04-16T12:54:44.9386389Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-04-16T12:54:44.9602851Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-04-16T12:54:44.9635659Z ##[endgroup]
+2026-04-16T12:54:44.9636731Z ##[group]Fetching the repository
+2026-04-16T12:54:44.9645810Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --progress --no-recurse-submodules --depth=1 origin +c63e86501138f111e7d8d275174f195300d3e3ba:refs/remotes/origin/main
+2026-04-16T12:54:45.1775474Z remote: Enumerating objects: 40, done.        
+2026-04-16T12:54:45.1777319Z remote: Counting objects:   2% (1/40)        
+2026-04-16T12:54:45.1778278Z remote: Counting objects:   5% (2/40)        
+2026-04-16T12:54:45.1779193Z remote: Counting objects:   7% (3/40)        
+2026-04-16T12:54:45.1780125Z remote: Counting objects:  10% (4/40)        
+2026-04-16T12:54:45.1781610Z remote: Counting objects:  12% (5/40)        
+2026-04-16T12:54:45.1783888Z remote: Counting objects:  15% (6/40)        
+2026-04-16T12:54:45.1785456Z remote: Counting objects:  17% (7/40)        
+2026-04-16T12:54:45.1786429Z remote: Counting objects:  20% (8/40)        
+2026-04-16T12:54:45.1787417Z remote: Counting objects:  22% (9/40)        
+2026-04-16T12:54:45.1788426Z remote: Counting objects:  25% (10/40)        
+2026-04-16T12:54:45.1789458Z remote: Counting objects:  27% (11/40)        
+2026-04-16T12:54:45.1790491Z remote: Counting objects:  30% (12/40)        
+2026-04-16T12:54:45.1791526Z remote: Counting objects:  32% (13/40)        
+2026-04-16T12:54:45.1792641Z remote: Counting objects:  35% (14/40)        
+2026-04-16T12:54:45.1793732Z remote: Counting objects:  37% (15/40)        
+2026-04-16T12:54:45.1794827Z remote: Counting objects:  40% (16/40)        
+2026-04-16T12:54:45.1796069Z remote: Counting objects:  42% (17/40)        
+2026-04-16T12:54:45.1797183Z remote: Counting objects:  45% (18/40)        
+2026-04-16T12:54:45.1798271Z remote: Counting objects:  47% (19/40)        
+2026-04-16T12:54:45.1799351Z remote: Counting objects:  50% (20/40)        
+2026-04-16T12:54:45.1800431Z remote: Counting objects:  52% (21/40)        
+2026-04-16T12:54:45.1801831Z remote: Counting objects:  55% (22/40)        
+2026-04-16T12:54:45.1802921Z remote: Counting objects:  57% (23/40)        
+2026-04-16T12:54:45.1805594Z remote: Counting objects:  60% (24/40)        
+2026-04-16T12:54:45.1807637Z remote: Counting objects:  62% (25/40)        
+2026-04-16T12:54:45.1809266Z remote: Counting objects:  65% (26/40)        
+2026-04-16T12:54:45.1810703Z remote: Counting objects:  67% (27/40)        
+2026-04-16T12:54:45.1812202Z remote: Counting objects:  70% (28/40)        
+2026-04-16T12:54:45.1813744Z remote: Counting objects:  72% (29/40)        
+2026-04-16T12:54:45.1815381Z remote: Counting objects:  75% (30/40)        
+2026-04-16T12:54:45.1817544Z remote: Counting objects:  77% (31/40)        
+2026-04-16T12:54:45.1820000Z remote: Counting objects:  80% (32/40)        
+2026-04-16T12:54:45.1822135Z remote: Counting objects:  82% (33/40)        
+2026-04-16T12:54:45.1824286Z remote: Counting objects:  85% (34/40)        
+2026-04-16T12:54:45.1825984Z remote: Counting objects:  87% (35/40)        
+2026-04-16T12:54:45.1827472Z remote: Counting objects:  90% (36/40)        
+2026-04-16T12:54:45.1828987Z remote: Counting objects:  92% (37/40)        
+2026-04-16T12:54:45.1830515Z remote: Counting objects:  95% (38/40)        
+2026-04-16T12:54:45.1832077Z remote: Counting objects:  97% (39/40)        
+2026-04-16T12:54:45.1833632Z remote: Counting objects: 100% (40/40)        
+2026-04-16T12:54:45.1835406Z remote: Counting objects: 100% (40/40), done.        
+2026-04-16T12:54:45.1837115Z remote: Compressing objects:   2% (1/34)        
+2026-04-16T12:54:45.1838728Z remote: Compressing objects:   5% (2/34)        
+2026-04-16T12:54:45.1840317Z remote: Compressing objects:   8% (3/34)        
+2026-04-16T12:54:45.1841924Z remote: Compressing objects:  11% (4/34)        
+2026-04-16T12:54:45.1843523Z remote: Compressing objects:  14% (5/34)        
+2026-04-16T12:54:45.1845278Z remote: Compressing objects:  17% (6/34)        
+2026-04-16T12:54:45.1846857Z remote: Compressing objects:  20% (7/34)        
+2026-04-16T12:54:45.1848673Z remote: Compressing objects:  23% (8/34)        
+2026-04-16T12:54:45.1850236Z remote: Compressing objects:  26% (9/34)        
+2026-04-16T12:54:45.1851860Z remote: Compressing objects:  29% (10/34)        
+2026-04-16T12:54:45.1853401Z remote: Compressing objects:  32% (11/34)        
+2026-04-16T12:54:45.1854956Z remote: Compressing objects:  35% (12/34)        
+2026-04-16T12:54:45.1856632Z remote: Compressing objects:  38% (13/34)        
+2026-04-16T12:54:45.1858165Z remote: Compressing objects:  41% (14/34)        
+2026-04-16T12:54:45.1859654Z remote: Compressing objects:  44% (15/34)        
+2026-04-16T12:54:45.1861140Z remote: Compressing objects:  47% (16/34)        
+2026-04-16T12:54:45.1862631Z remote: Compressing objects:  50% (17/34)        
+2026-04-16T12:54:45.1864112Z remote: Compressing objects:  52% (18/34)        
+2026-04-16T12:54:45.1865704Z remote: Compressing objects:  55% (19/34)        
+2026-04-16T12:54:45.1867194Z remote: Compressing objects:  58% (20/34)        
+2026-04-16T12:54:45.1868699Z remote: Compressing objects:  61% (21/34)        
+2026-04-16T12:54:45.1870188Z remote: Compressing objects:  64% (22/34)        
+2026-04-16T12:54:45.1871671Z remote: Compressing objects:  67% (23/34)        
+2026-04-16T12:54:45.1873179Z remote: Compressing objects:  70% (24/34)        
+2026-04-16T12:54:45.1874689Z remote: Compressing objects:  73% (25/34)        
+2026-04-16T12:54:45.1876310Z remote: Compressing objects:  76% (26/34)        
+2026-04-16T12:54:45.1877811Z remote: Compressing objects:  79% (27/34)        
+2026-04-16T12:54:45.1879313Z remote: Compressing objects:  82% (28/34)        
+2026-04-16T12:54:45.1880841Z remote: Compressing objects:  85% (29/34)        
+2026-04-16T12:54:45.1882418Z remote: Compressing objects:  88% (30/34)        
+2026-04-16T12:54:45.1883962Z remote: Compressing objects:  91% (31/34)        
+2026-04-16T12:54:45.1885598Z remote: Compressing objects:  94% (32/34)        
+2026-04-16T12:54:45.1887150Z remote: Compressing objects:  97% (33/34)        
+2026-04-16T12:54:45.1889219Z remote: Compressing objects: 100% (34/34)        
+2026-04-16T12:54:45.1890882Z remote: Compressing objects: 100% (34/34), done.        
+2026-04-16T12:54:45.2400517Z remote: Total 40 (delta 3), reused 26 (delta 2), pack-reused 0 (from 0)        
+2026-04-16T12:54:45.2457751Z From https://github.com/blessedman11-DrPark/mil-eng-apply
+2026-04-16T12:54:45.2460906Z  * [new ref]         c63e86501138f111e7d8d275174f195300d3e3ba -> origin/main
+2026-04-16T12:54:45.2488529Z ##[endgroup]
+2026-04-16T12:54:45.2491085Z ##[group]Determining the checkout info
+2026-04-16T12:54:45.2494073Z ##[endgroup]
+2026-04-16T12:54:45.2496730Z ##[group]Checking out the ref
+2026-04-16T12:54:45.2499453Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-04-16T12:54:45.2572448Z Switched to a new branch 'main'
+2026-04-16T12:54:45.2574735Z branch 'main' set up to track 'origin/main'.
+2026-04-16T12:54:45.2583550Z ##[endgroup]
+2026-04-16T12:54:45.2615909Z [command]/usr/bin/git log -1 --format='%H'
+2026-04-16T12:54:45.2637992Z 'c63e86501138f111e7d8d275174f195300d3e3ba'
+2026-04-16T12:54:45.2952947Z ##[group]Run amondnet/vercel-action@v25
+2026-04-16T12:54:45.2954173Z with:
+2026-04-16T12:54:45.2955984Z   vercel-token: ***
+2026-04-16T12:54:45.2957055Z   vercel-org-id: ***
+2026-04-16T12:54:45.2958200Z   vercel-project-id: ***
+2026-04-16T12:54:45.2959231Z   vercel-args: --prod
+2026-04-16T12:54:45.2960174Z   github-comment: true
+2026-04-16T12:54:45.2961142Z   github-deployment: false
+2026-04-16T12:54:45.2962128Z ##[endgroup]
+2026-04-16T12:54:45.3877770Z set environment for vercel cli
+2026-04-16T12:54:45.3885199Z set env variable : VERCEL_ORG_ID
+2026-04-16T12:54:45.3886660Z set env variable : VERCEL_PROJECT_ID
+2026-04-16T12:54:45.3992284Z [command]/usr/local/bin/npx vercel@25.1.0 --prod -t *** -m githubCommitSha=c63e86501138f111e7d8d275174f195300d3e3ba -m githubCommitAuthorName=blessedman11-DrPark -m githubCommitAuthorLogin=blessedman11-DrPark -m githubDeployment=1 -m githubOrg=blessedman11-DrPark -m githubRepo=mil-eng-apply -m githubCommitOrg=blessedman11-DrPark -m githubCommitRepo=mil-eng-apply -m githubCommitMessage="auto: Claude 코드 수정" -m githubCommitRef=main
+2026-04-16T12:54:52.7809249Z npm warn exec The following package was not found and will be installed: vercel@25.1.0
+2026-04-16T12:54:52.7811373Z 
+2026-04-16T12:54:52.7811866Z npm warn exec The following package was not found and will be installed: vercel@25.1.0
+2026-04-16T12:54:58.9381490Z npm warn deprecated osenv@0.1.5: This package is no longer supported.
+2026-04-16T12:54:58.9382015Z 
+2026-04-16T12:54:58.9382300Z npm warn deprecated osenv@0.1.5: This package is no longer supported.
+2026-04-16T12:54:59.5939173Z npm warn deprecated are-we-there-yet@2.0.0: This package is no longer supported.
+2026-04-16T12:54:59.5940268Z 
+2026-04-16T12:54:59.5941274Z npm warn deprecated are-we-there-yet@2.0.0: This package is no longer supported.
+2026-04-16T12:54:59.6750411Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2026-04-16T12:54:59.6752252Z 
+2026-04-16T12:54:59.6754274Z npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+2026-04-16T12:54:59.7141651Z npm warn deprecated npmlog@5.0.1: This package is no longer supported.
+2026-04-16T12:54:59.7142574Z 
+2026-04-16T12:54:59.7143696Z npm warn deprecated npmlog@5.0.1: This package is no longer supported.
+2026-04-16T12:54:59.7558497Z npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-04-16T12:54:59.7560061Z 
+2026-04-16T12:54:59.7562371Z npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-04-16T12:54:59.7685767Z npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+2026-04-16T12:54:59.7686873Z 
+2026-04-16T12:54:59.7687358Z npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+2026-04-16T12:54:59.7944649Z npm warn deprecated gauge@3.0.2: This package is no longer supported.
+2026-04-16T12:54:59.7945633Z 
+2026-04-16T12:54:59.7946089Z npm warn deprecated gauge@3.0.2: This package is no longer supported.
+2026-04-16T12:54:59.8742658Z npm warn deprecated are-we-there-yet@1.1.7: This package is no longer supported.
+2026-04-16T12:54:59.8744161Z 
+2026-04-16T12:54:59.8745413Z npm warn deprecated are-we-there-yet@1.1.7: This package is no longer supported.
+2026-04-16T12:54:59.8945663Z npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
+2026-04-16T12:54:59.8948123Z 
+2026-04-16T12:54:59.8949003Z npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
+2026-04-16T12:54:59.9068192Z npm warn deprecated npmlog@4.1.2: This package is no longer supported.
+2026-04-16T12:54:59.9068947Z 
+2026-04-16T12:54:59.9069321Z npm warn deprecated npmlog@4.1.2: This package is no longer supported.
+2026-04-16T12:54:59.9849689Z npm warn deprecated gauge@2.7.4: This package is no longer supported.
+2026-04-16T12:54:59.9851158Z 
+2026-04-16T12:54:59.9852052Z npm warn deprecated gauge@2.7.4: This package is no longer supported.
+2026-04-16T12:55:00.0411321Z npm warn deprecated tar@6.2.1: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-04-16T12:55:00.0412405Z 
+2026-04-16T12:55:00.0413461Z npm warn deprecated tar@6.2.1: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-04-16T12:55:00.0743566Z npm warn deprecated node-pre-gyp@0.13.0: Please upgrade to @mapbox/node-pre-gyp: the non-scoped node-pre-gyp package is deprecated and only the @mapbox scoped package will recieve updates in the future
+2026-04-16T12:55:00.0744856Z 
+2026-04-16T12:55:00.0746247Z npm warn deprecated node-pre-gyp@0.13.0: Please upgrade to @mapbox/node-pre-gyp: the non-scoped node-pre-gyp package is deprecated and only the @mapbox scoped package will recieve updates in the future
+2026-04-16T12:55:00.1176928Z npm warn deprecated tar@4.4.19: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-04-16T12:55:00.1178911Z 
+2026-04-16T12:55:00.1180266Z npm warn deprecated tar@4.4.19: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+2026-04-16T12:55:02.5551100Z Vercel CLI 25.1.0
+2026-04-16T12:55:02.5551344Z 
+2026-04-16T12:55:02.5551464Z Vercel CLI 25.1.0
+2026-04-16T12:55:02.5771315Z Retrieving project…
+2026-04-16T12:55:02.5771842Z 
+2026-04-16T12:55:02.5772306Z Retrieving project…
+2026-04-16T12:55:02.9462312Z Deploying dr-parks-projects/mil-eng-apply
+2026-04-16T12:55:02.9462699Z 
+2026-04-16T12:55:02.9462881Z Deploying dr-parks-projects/mil-eng-apply
+2026-04-16T12:55:03.4003743Z Error! Your Vercel CLI version is outdated. This endpoint requires version 47.2.2 or later. Please upgrade by running `npm i -g vercel@latest`.
+2026-04-16T12:55:03.4004686Z 
+2026-04-16T12:55:03.4005706Z Error! Your Vercel CLI version is outdated. This endpoint requires version 47.2.2 or later. Please upgrade by running `npm i -g vercel@latest`.
+2026-04-16T12:55:03.5008736Z ##[error]The process '/usr/local/bin/npx' failed with exit code 1
+2026-04-16T12:55:03.5214537Z Post job cleanup.
+2026-04-16T12:55:03.5952085Z [command]/usr/bin/git version
+2026-04-16T12:55:03.5986635Z git version 2.53.0
+2026-04-16T12:55:03.6028840Z Temporarily overriding HOME='/home/runner/work/_temp/8a03b51d-30e1-46f5-80f1-6c543abe9c11' before making global git config changes
+2026-04-16T12:55:03.6029739Z Adding repository directory to the temporary git global config as a safe directory
+2026-04-16T12:55:03.6032574Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/mil-eng-apply/mil-eng-apply
+2026-04-16T12:55:03.6062512Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-04-16T12:55:03.6090158Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-04-16T12:55:03.6299824Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-04-16T12:55:03.6319124Z http.https://github.com/.extraheader
+2026-04-16T12:55:03.6329549Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-04-16T12:55:03.6358062Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-04-16T12:55:03.6685796Z Cleaning up orphan processes
+2026-04-16T12:55:03.6954298Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v3, amondnet/vercel-action@v25. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

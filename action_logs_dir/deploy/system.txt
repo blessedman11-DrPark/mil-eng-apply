@@ -1,0 +1,8 @@
+2026-04-16T12:54:40.3950000Z Job is waiting for a hosted runner to come online.
+2026-04-16T12:54:40.3830000Z Evaluating deploy.if
+2026-04-16T12:54:40.3830000Z Evaluating: success()
+2026-04-16T12:54:40.3830000Z Result: true
+2026-04-16T12:54:40.3920000Z Job is about to start running on the hosted runner: GitHub Actions 1000000037
+2026-04-16T12:54:40.3870000Z Requested labels: ubuntu-latest
+2026-04-16T12:54:40.3870000Z Job defined at: blessedman11-DrPark/mil-eng-apply/.github/workflows/deploy.yml@refs/heads/main
+2026-04-16T12:54:40.3870000Z Waiting for a runner to pick up this job...
