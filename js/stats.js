@@ -149,8 +149,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ── 미신청: students에서 submissions에 없는 학생 ──
     const noApplySec = document.getElementById('no-apply-section');
     if (allStudents?.length) {
-      const appliedIds = new Set((subs || []).map(s => s.student_id));
-      const noApply = allStudents.filter(s => !appliedIds.has(s.student_id));
+      const appliedIds = new Set((subs || []).map(s => String(s.student_id)));
+      const noApply = allStudents.filter(s => !appliedIds.has(String(s.student_id)));
       if (noApply.length) {
         noApplySec.style.display = '';
         document.getElementById('no-apply-count').textContent = `(${noApply.length}명)`;

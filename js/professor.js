@@ -594,34 +594,41 @@ document.addEventListener('DOMContentLoaded', async () => {
       renderProfRankTable();
     }
 
-    // 회차별 기록
-    if (!wr?.length) { empty('stats-tbody-wr', 5); }
-    else document.getElementById('stats-tbody-wr').innerHTML = wr.map(r => `<tr>
-      <td>${escHtml(r.round_number)}회차</td><td>${escHtml(r.student_id)}</td><td>${escHtml(r.student_name)}</td>
-      <td>${escHtml(r.assigned_sentence)}번</td><td>${fmt(r.won_at)}</td>
-    </tr>`).join('');
+    // 회차별 기록 (해당 요소가 있을 때만)
+    const wrEl = document.getElementById('stats-tbody-wr');
+    if (wrEl) {
+      if (!wr?.length) { empty('stats-tbody-wr', 5); }
+      else wrEl.innerHTML = wr.map(r => `<tr>
+        <td>${escHtml(r.round_number)}회차</td><td>${escHtml(r.student_id)}</td><td>${escHtml(r.student_name)}</td>
+        <td>${escHtml(r.assigned_sentence)}번</td><td>${fmt(r.won_at)}</td>
+      </tr>`).join('');
+    }
 
     // 문장별 빈도
-    const sf = {};
-    (wr || []).forEach(r => { sf[r.assigned_sentence] = (sf[r.assigned_sentence] || 0) + 1; });
-    const sfSorted = Object.entries(sf).sort((a, b) => b[1] - a[1]);
-    if (!sfSorted.length) { empty('stats-tbody-sf', 2); }
-    else document.getElementById('stats-tbody-sf').innerHTML =
-      sfSorted.map(([n, c]) => `<tr><td>${n}번</td><td>${c}회</td></tr>`).join('');
+    const sfEl = document.getElementById('stats-tbody-sf');
+    if (sfEl) {
+      const sf = {};
+      (wr || []).forEach(r => { sf[r.assigned_sentence] = (sf[r.assigned_sentence] || 0) + 1; });
+      const sfSorted = Object.entries(sf).sort((a, b) => b[1] - a[1]);
+      if (!sfSorted.length) { empty('stats-tbody-sf', 2); }
+      else sfEl.innerHTML = sfSorted.map(([n, c]) => `<tr><td>${n}번</td><td>${c}회</td></tr>`).join('');
+    }
 
     // 월별
-    const mo = {};
-    (wr || []).forEach(r => { mo[r.won_month] = (mo[r.won_month] || 0) + 1; });
-    const moSorted = Object.entries(mo).sort((a, b) => b[0].localeCompare(a[0]));
-    if (!moSorted.length) { empty('stats-tbody-mo', 2); }
-    else document.getElementById('stats-tbody-mo').innerHTML =
-      moSorted.map(([m, c]) => `<tr><td>${m}</td><td>${c}건</td></tr>`).join('');
+    const moEl = document.getElementById('stats-tbody-mo');
+    if (moEl) {
+      const mo = {};
+      (wr || []).forEach(r => { mo[r.won_month] = (mo[r.won_month] || 0) + 1; });
+      const moSorted = Object.entries(mo).sort((a, b) => b[0].localeCompare(a[0]));
+      if (!moSorted.length) { empty('stats-tbody-mo', 2); }
+      else moEl.innerHTML = moSorted.map(([m, c]) => `<tr><td>${m}</td><td>${c}건</td></tr>`).join('');
+    }
 
     // ── 미신청: students에서 submissions에 없는 학생 ──
     const noApplySec = document.getElementById('prof-no-apply-section');
     if (allStudents?.length) {
-      const appliedIds = new Set((subs || []).map(s => s.student_id));
-      const noApply = allStudents.filter(s => !appliedIds.has(s.student_id));
+      const appliedIds = new Set((subs || []).map(s => String(s.student_id)));
+      const noApply = allStudents.filter(s => !appliedIds.has(String(s.student_id)));
       if (noApply.length) {
         noApplySec.style.display = '';
         document.getElementById('prof-no-apply-count').textContent = `(${noApply.length}명)`;
