@@ -504,6 +504,45 @@ document.addEventListener('DOMContentLoaded', async () => {
   let profSortMode = 'wins';
   let profBarChart = null;
 
+  function renderProfChart() {
+    if (!profWinHistoryData.length) return;
+    const sorted = [...profWinHistoryData].sort((a, b) => {
+      if (profSortMode === 'id') return String(a.student_id).localeCompare(String(b.student_id));
+      if (b.win_count !== a.win_count) return b.win_count - a.win_count;
+      return String(a.student_id).localeCompare(String(b.student_id));
+    });
+    const labels = sorted.map(h => h.student_id);
+    const values = sorted.map(h => h.win_count);
+    const maxVal = Math.max(...values);
+    const colors = values.map(v => {
+      const ratio = maxVal > 0 ? v / maxVal : 0;
+      const r = Math.round(197 + (26 - 197) * ratio);
+      const g = Math.round(216 + (71 - 216) * ratio);
+      const b = Math.round(255 + (214 - 255) * ratio);
+      return `rgb(${r},${g},${b})`;
+    });
+    document.getElementById('prof-chart-wrap').style.width = Math.max(500, labels.length * 64) + 'px';
+    const ctx = document.getElementById('prof-bar-chart').getContext('2d');
+    if (profBarChart) profBarChart.destroy();
+    profBarChart = new Chart(ctx, {
+      type: 'bar',
+      plugins: [ChartDataLabels],
+      data: { labels, datasets: [{ label: '당첨 횟수', data: values, backgroundColor: colors, borderRadius: 5, borderSkipped: false }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: '학생별 누계 당첨 횟수', font: { size: 14 } },
+          datalabels: { anchor: 'end', align: 'end', color: '#333', font: { weight: 'bold', size: 12 }, formatter: v => v },
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 }, grid: { color: '#eaeef5' } },
+          x: { grid: { display: false } },
+        },
+      },
+    });
+  }
+
   function renderProfRankTable() {
     if (!profWinHistoryData.length) return;
     const sorted = [...profWinHistoryData].sort((a, b) => {
@@ -521,12 +560,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     profSortMode = 'wins';
     document.getElementById('prof-sort-by-wins').classList.add('active');
     document.getElementById('prof-sort-by-id').classList.remove('active');
+    renderProfChart();
     renderProfRankTable();
   });
   document.getElementById('prof-sort-by-id').addEventListener('click', () => {
     profSortMode = 'id';
     document.getElementById('prof-sort-by-id').classList.add('active');
     document.getElementById('prof-sort-by-wins').classList.remove('active');
+    renderProfChart();
     renderProfRankTable();
   });
 
@@ -546,46 +587,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
       document.getElementById('prof-chart-empty').classList.add('hidden');
       document.getElementById('prof-chart-wrap').style.display = '';
-
-      const chartData = [...profWinHistoryData].sort((a, b) =>
-        b.win_count !== a.win_count ? b.win_count - a.win_count : String(a.student_id).localeCompare(String(b.student_id))
-      );
-      const labels = chartData.map(h => h.student_id);
-      const values = chartData.map(h => h.win_count);
-      const maxVal = Math.max(...values);
-      const colors = values.map(v => {
-        const ratio = maxVal > 0 ? v / maxVal : 0;
-        const r = Math.round(197 + (26 - 197) * ratio);
-        const g = Math.round(216 + (71 - 216) * ratio);
-        const b = Math.round(255 + (214 - 255) * ratio);
-        return `rgb(${r},${g},${b})`;
-      });
-      document.getElementById('prof-chart-wrap').style.width = Math.max(500, labels.length * 64) + 'px';
-
-      const ctx = document.getElementById('prof-bar-chart').getContext('2d');
-      if (profBarChart) profBarChart.destroy();
-      profBarChart = new Chart(ctx, {
-        type: 'bar',
-        plugins: [ChartDataLabels],
-        data: {
-          labels,
-          datasets: [{ label: '당첨 횟수', data: values, backgroundColor: colors, borderRadius: 5, borderSkipped: false }],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            title: { display: true, text: '학생별 누계 당첨 횟수', font: { size: 14 } },
-            datalabels: { anchor: 'end', align: 'end', color: '#333', font: { weight: 'bold', size: 12 }, formatter: v => v },
-          },
-          scales: {
-            y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 }, grid: { color: '#eaeef5' } },
-            x: { grid: { display: false } },
-          },
-        },
-      });
-
+      renderProfChart();
       renderProfRankTable();
     }
 

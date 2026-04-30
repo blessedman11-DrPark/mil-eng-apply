@@ -22,6 +22,45 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ════════ 정렬 버튼 ════════
+  function renderChart() {
+    if (!winHistoryData.length) return;
+    const sorted = [...winHistoryData].sort((a, b) => {
+      if (sortMode === 'id') return String(a.student_id).localeCompare(String(b.student_id));
+      if (b.win_count !== a.win_count) return b.win_count - a.win_count;
+      return String(a.student_id).localeCompare(String(b.student_id));
+    });
+    const labels = sorted.map(h => h.student_id);
+    const values = sorted.map(h => h.win_count);
+    const maxVal = Math.max(...values);
+    const colors = values.map(v => {
+      const ratio = maxVal > 0 ? v / maxVal : 0;
+      const r = Math.round(197 + (26 - 197) * ratio);
+      const g = Math.round(216 + (71 - 216) * ratio);
+      const b = Math.round(255 + (214 - 255) * ratio);
+      return `rgb(${r},${g},${b})`;
+    });
+    document.getElementById('chart-wrap').style.width = Math.max(500, labels.length * 64) + 'px';
+    const ctx = document.getElementById('bar-chart').getContext('2d');
+    if (barChart) barChart.destroy();
+    barChart = new Chart(ctx, {
+      type: 'bar',
+      plugins: [ChartDataLabels],
+      data: { labels, datasets: [{ label: '당첨 횟수', data: values, backgroundColor: colors, borderRadius: 5, borderSkipped: false }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: '학생별 누계 당첨 횟수', font: { size: 14 } },
+          datalabels: { anchor: 'end', align: 'end', color: '#333', font: { weight: 'bold', size: 12 }, formatter: v => v },
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 }, grid: { color: '#eaeef5' } },
+          x: { grid: { display: false } },
+        },
+      },
+    });
+  }
+
   function renderRankTable() {
     if (!winHistoryData.length) return;
     const sorted = [...winHistoryData].sort((a, b) => {
@@ -42,12 +81,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     sortMode = 'wins';
     document.getElementById('sort-by-wins').classList.add('active');
     document.getElementById('sort-by-id').classList.remove('active');
+    renderChart();
     renderRankTable();
   });
   document.getElementById('sort-by-id').addEventListener('click', () => {
     sortMode = 'id';
     document.getElementById('sort-by-id').classList.add('active');
     document.getElementById('sort-by-wins').classList.remove('active');
+    renderChart();
     renderRankTable();
   });
 
@@ -82,70 +123,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('chart-empty').classList.add('hidden');
     document.getElementById('chart-wrap').style.display = '';
 
-    // ── 차트 (당첨횟수 내림차순, 동점 시 학번 오름차순) ──
-    const chartData = [...winHistoryData].sort((a, b) =>
-      b.win_count !== a.win_count ? b.win_count - a.win_count : String(a.student_id).localeCompare(String(b.student_id))
-    );
-    const labels = chartData.map(h => h.student_id);
-    const values = chartData.map(h => h.win_count);
-    const maxVal = Math.max(...values);
-
-    // 그라데이션 색상: 높을수록 진한 파란색
-    const colors = values.map(v => {
-      const ratio = maxVal > 0 ? v / maxVal : 0;
-      const r = Math.round(197 + (26 - 197) * ratio);
-      const g = Math.round(216 + (71 - 216) * ratio);
-      const b = Math.round(255 + (214 - 255) * ratio);
-      return `rgb(${r},${g},${b})`;
-    });
-
-    // 학생 수에 따라 캔버스 너비 조정
-    const minW = Math.max(500, labels.length * 64);
-    document.getElementById('chart-wrap').style.width = minW + 'px';
-
-    const ctx = document.getElementById('bar-chart').getContext('2d');
-    if (barChart) barChart.destroy();
-
-    ChartDataLabels; // ensure plugin is registered
-    barChart = new Chart(ctx, {
-      type: 'bar',
-      plugins: [ChartDataLabels],
-      data: {
-        labels,
-        datasets: [{
-          label: '당첨 횟수',
-          data: values,
-          backgroundColor: colors,
-          borderRadius: 5,
-          borderSkipped: false,
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          title: { display: true, text: '학생별 누계 당첨 횟수', font: { size: 14 } },
-          datalabels: {
-            anchor: 'end',
-            align: 'end',
-            color: '#333',
-            font: { weight: 'bold', size: 12 },
-            formatter: v => v,
-          },
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { stepSize: 1, precision: 0 },
-            grid: { color: '#eaeef5' },
-          },
-          x: { grid: { display: false } },
-        },
-      },
-    });
-
-    // ── 순위 테이블 ──
+    renderChart();
     renderRankTable();
 
     // ── 미당첨: submissions에서 win_history에 없는 학생 ──
