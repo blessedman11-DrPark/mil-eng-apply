@@ -576,7 +576,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const [{ data: wh }, { data: wr }, { data: allStudents }, { data: subs }] = await Promise.all([
       db.from(TABLES.WIN_HISTORY).select('*').order('win_count', { ascending: false }),
       db.from(TABLES.WIN_RECORDS).select('*').order('won_at', { ascending: false }),
-      db.from(TABLES.STUDENTS).select('student_id').order('student_id'),
+      db.from(TABLES.STUDENTS).select('student_id, student_name').order('student_id'),
       db.from(TABLES.SUBMISSIONS).select('student_id'),
     ]);
 
@@ -625,7 +625,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (noApply.length) {
         noApplySec.style.display = '';
         document.getElementById('prof-no-apply-count').textContent = `(${noApply.length}명)`;
-        document.getElementById('prof-no-apply-list').textContent = noApply.map(s => s.student_id).join(', ');
+        document.getElementById('prof-no-apply-list').textContent = noApply.map(s => `${s.student_name} (${s.student_id})`).join(', ');
       } else {
         noApplySec.style.display = 'none';
       }

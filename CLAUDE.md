@@ -38,6 +38,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | 테이블 | 용도 |
 |---|---|
+| `students` | 전체 수강생 명단 (student_id PK, student_name) |
 | `settings` | 총 문장 수, 신청 허용 여부, 배정 완료 여부, 비밀번호 |
 | `submissions` | 학생 신청 데이터 (학번, 이름, 1~3지망, 배정 결과) |
 | `rounds` | 회차 기록 |

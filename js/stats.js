@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ── 미당첨: submissions에서 win_history에 없는 학생 ──
     const [{ data: subs }, { data: allStudents }] = await Promise.all([
       db.from(TABLES.SUBMISSIONS).select('student_id,student_name'),
-      db.from(TABLES.STUDENTS).select('student_id').order('student_id'),
+      db.from(TABLES.STUDENTS).select('student_id, student_name').order('student_id'),
     ]);
 
     if (subs?.length) {
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (noApply.length) {
         noApplySec.style.display = '';
         document.getElementById('no-apply-count').textContent = `(${noApply.length}명)`;
-        document.getElementById('no-apply-list').textContent = noApply.map(s => s.student_id).join(', ');
+        document.getElementById('no-apply-list').textContent = noApply.map(s => `${s.student_name} (${s.student_id})`).join(', ');
       } else {
         noApplySec.style.display = 'none';
       }
