@@ -5,6 +5,8 @@ node_modules/
 .vercel
 .claude/
 .playwright-mcp/
+action_logs*
+tests/screenshots/
 *.png
 *.jpg
 *.jpeg
