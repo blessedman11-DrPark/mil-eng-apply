@@ -624,10 +624,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       else moEl.innerHTML = moSorted.map(([m, c]) => `<tr><td>${m}</td><td>${c}건</td></tr>`).join('');
     }
 
-    // ── 미신청: students에서 submissions에 없는 학생 ──
+    // ── 미신청: students에서 submissions·win_history 모두에 없는 학생 ──
     const noApplySec = document.getElementById('prof-no-apply-section');
     if (allStudents?.length) {
-      const appliedIds = new Set((subs || []).map(s => String(s.student_id)));
+      const appliedIds = new Set([
+        ...(subs || []).map(s => String(s.student_id)),
+        ...(wh || []).map(h => String(h.student_id)),
+      ]);
       const noApply = allStudents.filter(s => !appliedIds.has(String(s.student_id)));
       if (noApply.length) {
         noApplySec.style.display = '';
