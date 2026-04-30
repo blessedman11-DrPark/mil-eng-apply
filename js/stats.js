@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         responsive: true, maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
-          title: { display: true, text: '학생별 누계 당첨 횟수', font: { size: 14 } },
+          title: { display: false },
           datalabels: { anchor: 'end', align: 'end', color: '#333', font: { weight: 'bold', size: 12 }, formatter: v => v },
         },
         scales: {
