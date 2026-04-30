@@ -500,6 +500,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ════════════════════════════════════════════════════════════
   // 탭4: 통계
   // ════════════════════════════════════════════════════════════
+  let profWinHistoryData = [];
+  let profSortMode = 'wins';
+
+  function renderProfRankTable() {
+    if (!profWinHistoryData.length) return;
+    const sorted = [...profWinHistoryData].sort((a, b) => {
+      if (profSortMode === 'id') return String(a.student_id).localeCompare(String(b.student_id));
+      if (b.win_count !== a.win_count) return b.win_count - a.win_count;
+      return String(a.student_id).localeCompare(String(b.student_id));
+    });
+    document.getElementById('stats-tbody-wh').innerHTML = sorted.map((h, i) => `<tr>
+      <td>${i + 1}</td><td>${escHtml(h.student_id)}</td><td>${escHtml(h.student_name)}</td>
+      <td>${escHtml(h.win_count)}</td><td>${fmtDate(h.last_won_at)}</td>
+    </tr>`).join('');
+  }
+
+  document.getElementById('prof-sort-by-wins').addEventListener('click', () => {
+    profSortMode = 'wins';
+    document.getElementById('prof-sort-by-wins').classList.add('active');
+    document.getElementById('prof-sort-by-id').classList.remove('active');
+    renderProfRankTable();
+  });
+  document.getElementById('prof-sort-by-id').addEventListener('click', () => {
+    profSortMode = 'id';
+    document.getElementById('prof-sort-by-id').classList.add('active');
+    document.getElementById('prof-sort-by-wins').classList.remove('active');
+    renderProfRankTable();
+  });
+
   async function loadStatistics() {
     const [{ data: wh }, { data: wr }] = await Promise.all([
       db.from(TABLES.WIN_HISTORY).select('*').order('win_count', { ascending: false }),
@@ -507,11 +536,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     ]);
 
     // 학생별 누계
-    if (!wh?.length) { empty('stats-tbody-wh', 5); }
-    else document.getElementById('stats-tbody-wh').innerHTML = wh.map((h, i) => `<tr>
-      <td>${i + 1}</td><td>${escHtml(h.student_id)}</td><td>${escHtml(h.student_name)}</td>
-      <td>${escHtml(h.win_count)}</td><td>${fmtDate(h.last_won_at)}</td>
-    </tr>`).join('');
+    profWinHistoryData = wh || [];
+    if (!profWinHistoryData.length) { empty('stats-tbody-wh', 5); }
+    else renderProfRankTable();
 
     // 회차별 기록
     if (!wr?.length) { empty('stats-tbody-wr', 5); }

@@ -257,7 +257,13 @@
   <div id="tab-statistics" class="tab-content">
 
     <div class="section-card">
-      <h2>학생별 누계 당첨 횟수</h2>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem">
+        <h2 style="margin:0">학생별 누계 당첨 횟수</h2>
+        <div class="sort-btn-group">
+          <button class="btn btn-sm sort-btn active" id="prof-sort-by-wins">당첨횟수 순</button>
+          <button class="btn btn-sm sort-btn" id="prof-sort-by-id">학번 순</button>
+        </div>
+      </div>
       <div class="table-wrap">
         <table>
           <thead><tr><th>순위</th><th>학번</th><th>이름</th><th>당첨 횟수</th><th>마지막 당첨일</th></tr></thead>
