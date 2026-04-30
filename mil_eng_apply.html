@@ -26,13 +26,29 @@
       <h2>교수</h2>
       <p>대시보드 접속</p>
     </button>
-    <button class="card" onclick="location.href='stats.html'">
+    <button class="card" id="btn-stats">
       <div class="card-icon">📊</div>
       <h2>통계 보기</h2>
       <p>배정 현황 확인</p>
     </button>
   </div>
 </main>
+
+<!-- 통계 암호 모달 -->
+<div class="modal-overlay" id="stats-pw-modal">
+  <div class="modal">
+    <h3>🔒 통계 접근</h3>
+    <div class="form-group">
+      <label for="stats-pw-input">암호</label>
+      <input type="password" id="stats-pw-input" placeholder="암호: g*" autocomplete="off"/>
+    </div>
+    <div id="stats-pw-error" class="msg msg-error hidden"></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" id="stats-pw-cancel">취소</button>
+      <button class="btn btn-primary" id="stats-pw-confirm">확인</button>
+    </div>
+  </div>
+</div>
 
 <!-- 교수 비밀번호 모달 -->
 <div class="modal-overlay" id="pw-modal">
@@ -60,6 +76,36 @@
 <script>
   initSupabase();
 
+  // ── 통계 암호 모달 ──
+  const statsModal   = document.getElementById('stats-pw-modal');
+  const statsPwInput = document.getElementById('stats-pw-input');
+  const statsPwError = document.getElementById('stats-pw-error');
+
+  document.getElementById('btn-stats').addEventListener('click', () => {
+    statsPwInput.value = '';
+    statsPwError.classList.add('hidden');
+    statsModal.classList.add('open');
+    setTimeout(() => statsPwInput.focus(), 80);
+  });
+
+  document.getElementById('stats-pw-cancel').addEventListener('click', () => statsModal.classList.remove('open'));
+  statsModal.addEventListener('click', e => { if (e.target === statsModal) statsModal.classList.remove('open'); });
+
+  document.getElementById('stats-pw-confirm').addEventListener('click', checkStatsPassword);
+  statsPwInput.addEventListener('keydown', e => { if (e.key === 'Enter') checkStatsPassword(); });
+
+  function checkStatsPassword() {
+    if (statsPwInput.value.trim() === 'gladiolus') {
+      location.href = 'stats.html';
+    } else {
+      statsPwError.textContent = '암호가 올바르지 않습니다.';
+      statsPwError.classList.remove('hidden');
+      statsPwInput.focus();
+      statsPwInput.select();
+    }
+  }
+
+  // ── 교수 비밀번호 모달 ──
   const modal   = document.getElementById('pw-modal');
   const pwInput = document.getElementById('pw-input');
   const pwError = document.getElementById('pw-error');
