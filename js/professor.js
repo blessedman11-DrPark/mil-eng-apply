@@ -547,8 +547,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('prof-chart-empty').classList.add('hidden');
       document.getElementById('prof-chart-wrap').style.display = '';
 
-      const labels = profWinHistoryData.map(h => h.student_id);
-      const values = profWinHistoryData.map(h => h.win_count);
+      const chartData = [...profWinHistoryData].sort((a, b) =>
+        b.win_count !== a.win_count ? b.win_count - a.win_count : String(a.student_id).localeCompare(String(b.student_id))
+      );
+      const labels = chartData.map(h => h.student_id);
+      const values = chartData.map(h => h.win_count);
       const maxVal = Math.max(...values);
       const colors = values.map(v => {
         const ratio = maxVal > 0 ? v / maxVal : 0;

@@ -82,9 +82,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('chart-empty').classList.add('hidden');
     document.getElementById('chart-wrap').style.display = '';
 
-    // ── 차트 (당첨횟수 내림차순 고정) ──
-    const labels = winHistoryData.map(h => h.student_id);
-    const values = winHistoryData.map(h => h.win_count);
+    // ── 차트 (당첨횟수 내림차순, 동점 시 학번 오름차순) ──
+    const chartData = [...winHistoryData].sort((a, b) =>
+      b.win_count !== a.win_count ? b.win_count - a.win_count : String(a.student_id).localeCompare(String(b.student_id))
+    );
+    const labels = chartData.map(h => h.student_id);
+    const values = chartData.map(h => h.win_count);
     const maxVal = Math.max(...values);
 
     // 그라데이션 색상: 높을수록 진한 파란색
