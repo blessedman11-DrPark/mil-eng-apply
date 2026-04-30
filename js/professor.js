@@ -635,7 +635,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (noApply.length) {
         noApplySec.style.display = '';
         document.getElementById('prof-no-apply-count').textContent = `(${noApply.length}명)`;
-        document.getElementById('prof-no-apply-list').textContent = noApply.map(s => `${s.student_name} (${s.student_id})`).join(', ');
+        document.getElementById('prof-no-apply-list').textContent = noApply.map(s => `${s.student_id} (${s.student_name})`).join(', ');
       } else {
         noApplySec.style.display = 'none';
       }
