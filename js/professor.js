@@ -635,7 +635,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (noApply.length) {
         noApplySec.style.display = '';
         document.getElementById('prof-no-apply-count').textContent = `(${noApply.length}명)`;
-        document.getElementById('prof-no-apply-list').textContent = noApply.map(s => `${s.student_id} (${s.student_name})`).join(', ');
+
+        let profShowNames = false;
+        const renderProfNoApplyList = () => {
+          document.getElementById('prof-no-apply-list').textContent = profShowNames
+            ? noApply.map(s => `${s.student_id} (${s.student_name})`).join(', ')
+            : noApply.map(s => s.student_id).join(', ');
+        };
+        renderProfNoApplyList();
+
+        const toggleBtn = document.getElementById('prof-no-apply-name-toggle');
+        toggleBtn.onclick = () => {
+          profShowNames = !profShowNames;
+          toggleBtn.textContent = profShowNames ? '이름 숨기기' : '이름 표시';
+          renderProfNoApplyList();
+        };
       } else {
         noApplySec.style.display = 'none';
       }

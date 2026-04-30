@@ -62,7 +62,10 @@
 
     <!-- 미신청 -->
     <div class="section-card" id="no-apply-section" style="display:none">
-      <h2>미신청 학생 <span id="no-apply-count" style="font-size:.85rem;font-weight:400;color:#999"></span></h2>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem">
+        <h2 style="margin:0">미신청 학생 <span id="no-apply-count" style="font-size:.85rem;font-weight:400;color:#999"></span></h2>
+        <button class="btn btn-sm btn-secondary" id="no-apply-name-toggle">이름 표시</button>
+      </div>
       <div id="no-apply-list" style="font-size:.9rem;color:#666;line-height:1.9"></div>
     </div>
   </div>
