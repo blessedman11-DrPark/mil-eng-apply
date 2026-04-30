@@ -530,10 +530,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       data: { labels, datasets: [{ label: '당첨 횟수', data: values, backgroundColor: colors, borderRadius: 5, borderSkipped: false }] },
       options: {
         responsive: true, maintainAspectRatio: false,
+        layout: { padding: { top: 24 } },
         plugins: {
           legend: { display: false },
           title: { display: false },
-          datalabels: { anchor: 'end', align: 'end', color: '#333', font: { weight: 'bold', size: 12 }, formatter: v => v },
+          datalabels: { anchor: 'end', align: 'end', color: '#333', font: { weight: 'bold', size: 12 }, formatter: v => v, clip: false },
         },
         scales: {
           y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 }, grid: { color: '#eaeef5' } },
