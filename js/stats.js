@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!initSupabase()) return;
 
   let barChart = null;
+  let winHistoryData = [];
+  let sortMode = 'wins'; // 'wins' | 'id'
 
   function fmt(iso) {
     if (!iso) return '-';
@@ -18,6 +20,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById(tbodyId).innerHTML =
       `<tr><td colspan="${cols}" class="text-center text-muted" style="padding:1rem">데이터가 없습니다</td></tr>`;
   }
+
+  // ════════ 정렬 버튼 ════════
+  function renderRankTable() {
+    if (!winHistoryData.length) return;
+    const sorted = [...winHistoryData].sort((a, b) => {
+      if (sortMode === 'id') return String(a.student_id).localeCompare(String(b.student_id));
+      if (b.win_count !== a.win_count) return b.win_count - a.win_count;
+      return String(a.student_id).localeCompare(String(b.student_id));
+    });
+    document.getElementById('tbody-rank').innerHTML = sorted.map((h, i) => `<tr>
+      <td>${i + 1}</td>
+      <td>${escHtml(h.student_id)}</td>
+      <td>${escHtml(h.student_name)}</td>
+      <td>${escHtml(h.win_count)}</td>
+      <td>${fmtDate(h.last_won_at)}</td>
+    </tr>`).join('');
+  }
+
+  document.getElementById('sort-by-wins').addEventListener('click', () => {
+    sortMode = 'wins';
+    document.getElementById('sort-by-wins').classList.add('active');
+    document.getElementById('sort-by-id').classList.remove('active');
+    renderRankTable();
+  });
+  document.getElementById('sort-by-id').addEventListener('click', () => {
+    sortMode = 'id';
+    document.getElementById('sort-by-id').classList.add('active');
+    document.getElementById('sort-by-wins').classList.remove('active');
+    renderRankTable();
+  });
 
   // ════════ 탭 전환 ════════
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -38,8 +70,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ════════════════════════════════════════════════════════════
   async function loadStudentsTab() {
     const { data: wh } = await db.from(TABLES.WIN_HISTORY).select('*').order('win_count', { ascending: false });
+    winHistoryData = wh || [];
 
-    if (!wh?.length) {
+    if (!winHistoryData.length) {
       document.getElementById('chart-empty').classList.remove('hidden');
       document.getElementById('chart-wrap').style.display = 'none';
       empty('tbody-rank', 5);
@@ -49,9 +82,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('chart-empty').classList.add('hidden');
     document.getElementById('chart-wrap').style.display = '';
 
-    // ── 차트 ──
-    const labels = wh.map(h => h.student_id);
-    const values = wh.map(h => h.win_count);
+    // ── 차트 (당첨횟수 내림차순 고정) ──
+    const labels = winHistoryData.map(h => h.student_id);
+    const values = winHistoryData.map(h => h.win_count);
     const maxVal = Math.max(...values);
 
     // 그라데이션 색상: 높을수록 진한 파란색
@@ -110,13 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // ── 순위 테이블 ──
-    document.getElementById('tbody-rank').innerHTML = wh.map((h, i) => `<tr>
-      <td>${i + 1}</td>
-      <td>${escHtml(h.student_id)}</td>
-      <td>${escHtml(h.student_name)}</td>
-      <td>${escHtml(h.win_count)}</td>
-      <td>${fmtDate(h.last_won_at)}</td>
-    </tr>`).join('');
+    renderRankTable();
 
     // ── 미당첨: submissions에서 win_history에 없는 학생 ──
     const { data: subs } = await db.from(TABLES.SUBMISSIONS).select('student_id,student_name');

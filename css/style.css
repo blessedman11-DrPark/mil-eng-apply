@@ -33,6 +33,10 @@ header h1 { font-size: 1.15rem; font-weight: 700; }
 .btn-success { background: #2aa058; color: #fff; }
 .btn-success:hover:not(:disabled) { background: #1f8048; }
 .btn-sm { padding: .35rem .75rem; font-size: .82rem; }
+.sort-btn-group { display: flex; gap: .35rem; }
+.sort-btn { background: #e4e9f2; color: #1a1a2e; }
+.sort-btn:hover { background: #ccd4e6; }
+.sort-btn.active { background: #4a7fff; color: #fff; }
 
 /* ===== Forms ===== */
 .form-group { display: flex; flex-direction: column; gap: .4rem; margin-bottom: .85rem; }
