@@ -573,9 +573,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   async function loadStatistics() {
-    const [{ data: wh }, { data: wr }] = await Promise.all([
+    const [{ data: wh }, { data: wr }, { data: allStudents }, { data: subs }] = await Promise.all([
       db.from(TABLES.WIN_HISTORY).select('*').order('win_count', { ascending: false }),
       db.from(TABLES.WIN_RECORDS).select('*').order('won_at', { ascending: false }),
+      db.from(TABLES.STUDENTS).select('student_id').order('student_id'),
+      db.from(TABLES.SUBMISSIONS).select('student_id'),
     ]);
 
     // 학생별 누계
@@ -614,6 +616,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!moSorted.length) { empty('stats-tbody-mo', 2); }
     else document.getElementById('stats-tbody-mo').innerHTML =
       moSorted.map(([m, c]) => `<tr><td>${m}</td><td>${c}건</td></tr>`).join('');
+
+    // ── 미신청: students에서 submissions에 없는 학생 ──
+    const noApplySec = document.getElementById('prof-no-apply-section');
+    if (allStudents?.length) {
+      const appliedIds = new Set((subs || []).map(s => s.student_id));
+      const noApply = allStudents.filter(s => !appliedIds.has(s.student_id));
+      if (noApply.length) {
+        noApplySec.style.display = '';
+        document.getElementById('prof-no-apply-count').textContent = `(${noApply.length}명)`;
+        document.getElementById('prof-no-apply-list').textContent = noApply.map(s => s.student_id).join(', ');
+      } else {
+        noApplySec.style.display = 'none';
+      }
+    } else {
+      noApplySec.style.display = 'none';
+    }
   }
 
   // ════════ 초기화 ════════

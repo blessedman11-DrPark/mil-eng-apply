@@ -128,10 +128,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderRankTable();
 
     // ── 미당첨: submissions에서 win_history에 없는 학생 ──
-    const { data: subs } = await db.from(TABLES.SUBMISSIONS).select('student_id,student_name');
+    const [{ data: subs }, { data: allStudents }] = await Promise.all([
+      db.from(TABLES.SUBMISSIONS).select('student_id,student_name'),
+      db.from(TABLES.STUDENTS).select('student_id').order('student_id'),
+    ]);
+
     if (subs?.length) {
       const wonIds = new Set(wh.map(h => h.student_id));
-      const noWin = (subs || []).filter(s => !wonIds.has(s.student_id));
+      const noWin = subs.filter(s => !wonIds.has(s.student_id));
       const sec = document.getElementById('no-win-section');
       if (noWin.length) {
         sec.style.display = '';
@@ -140,6 +144,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         sec.style.display = 'none';
       }
+    }
+
+    // ── 미신청: students에서 submissions에 없는 학생 ──
+    const noApplySec = document.getElementById('no-apply-section');
+    if (allStudents?.length) {
+      const appliedIds = new Set((subs || []).map(s => s.student_id));
+      const noApply = allStudents.filter(s => !appliedIds.has(s.student_id));
+      if (noApply.length) {
+        noApplySec.style.display = '';
+        document.getElementById('no-apply-count').textContent = `(${noApply.length}명)`;
+        document.getElementById('no-apply-list').textContent = noApply.map(s => s.student_id).join(', ');
+      } else {
+        noApplySec.style.display = 'none';
+      }
+    } else {
+      noApplySec.style.display = 'none';
     }
   }
 
