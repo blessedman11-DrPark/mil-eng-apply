@@ -502,6 +502,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ════════════════════════════════════════════════════════════
   let profWinHistoryData = [];
   let profSortMode = 'wins';
+  let profBarChart = null;
 
   function renderProfRankTable() {
     if (!profWinHistoryData.length) return;
@@ -537,8 +538,53 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 학생별 누계
     profWinHistoryData = wh || [];
-    if (!profWinHistoryData.length) { empty('stats-tbody-wh', 5); }
-    else renderProfRankTable();
+
+    if (!profWinHistoryData.length) {
+      document.getElementById('prof-chart-empty').classList.remove('hidden');
+      document.getElementById('prof-chart-wrap').style.display = 'none';
+      empty('stats-tbody-wh', 5);
+    } else {
+      document.getElementById('prof-chart-empty').classList.add('hidden');
+      document.getElementById('prof-chart-wrap').style.display = '';
+
+      const labels = profWinHistoryData.map(h => h.student_id);
+      const values = profWinHistoryData.map(h => h.win_count);
+      const maxVal = Math.max(...values);
+      const colors = values.map(v => {
+        const ratio = maxVal > 0 ? v / maxVal : 0;
+        const r = Math.round(197 + (26 - 197) * ratio);
+        const g = Math.round(216 + (71 - 216) * ratio);
+        const b = Math.round(255 + (214 - 255) * ratio);
+        return `rgb(${r},${g},${b})`;
+      });
+      document.getElementById('prof-chart-wrap').style.width = Math.max(500, labels.length * 64) + 'px';
+
+      const ctx = document.getElementById('prof-bar-chart').getContext('2d');
+      if (profBarChart) profBarChart.destroy();
+      profBarChart = new Chart(ctx, {
+        type: 'bar',
+        plugins: [ChartDataLabels],
+        data: {
+          labels,
+          datasets: [{ label: '당첨 횟수', data: values, backgroundColor: colors, borderRadius: 5, borderSkipped: false }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: '학생별 누계 당첨 횟수', font: { size: 14 } },
+            datalabels: { anchor: 'end', align: 'end', color: '#333', font: { weight: 'bold', size: 12 }, formatter: v => v },
+          },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 }, grid: { color: '#eaeef5' } },
+            x: { grid: { display: false } },
+          },
+        },
+      });
+
+      renderProfRankTable();
+    }
 
     // 회차별 기록
     if (!wr?.length) { empty('stats-tbody-wr', 5); }

@@ -6,6 +6,8 @@
   <title>군사영어-교수용</title>
   <link rel="stylesheet" href="css/style.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 </head>
 <body>
 <header>
@@ -257,8 +259,18 @@
   <div id="tab-statistics" class="tab-content">
 
     <div class="section-card">
+      <h2>학생별 누계 당첨 횟수</h2>
+      <div class="chart-outer">
+        <div class="chart-inner" id="prof-chart-wrap">
+          <canvas id="prof-bar-chart"></canvas>
+        </div>
+      </div>
+      <p id="prof-chart-empty" class="text-muted text-center mt-2 hidden">데이터가 없습니다</p>
+    </div>
+
+    <div class="section-card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem">
-        <h2 style="margin:0">학생별 누계 당첨 횟수</h2>
+        <h2 style="margin:0">당첨 순위</h2>
         <div class="sort-btn-group">
           <button class="btn btn-sm sort-btn active" id="prof-sort-by-wins">당첨횟수 순</button>
           <button class="btn btn-sm sort-btn" id="prof-sort-by-id">학번 순</button>
