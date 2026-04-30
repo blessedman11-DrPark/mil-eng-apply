@@ -159,17 +159,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('no-apply-count').textContent = `(${noApply.length}명)`;
 
         let showNames = false;
+        let listVisible = false;
+
+        const listEl = document.getElementById('no-apply-list');
+        const nameToggleBtn = document.getElementById('no-apply-name-toggle');
+        const sectionToggleBtn = document.getElementById('no-apply-section-toggle');
+
         const renderNoApplyList = () => {
-          document.getElementById('no-apply-list').textContent = showNames
+          listEl.textContent = showNames
             ? noApply.map(s => `${s.student_id} (${s.student_name})`).join(', ')
             : noApply.map(s => s.student_id).join(', ');
         };
-        renderNoApplyList();
 
-        const toggleBtn = document.getElementById('no-apply-name-toggle');
-        toggleBtn.onclick = () => {
+        sectionToggleBtn.onclick = () => {
+          listVisible = !listVisible;
+          listEl.style.display = listVisible ? '' : 'none';
+          sectionToggleBtn.textContent = listVisible ? '숨기기' : '보기';
+          nameToggleBtn.style.display = listVisible ? '' : 'none';
+          if (!listVisible) {
+            showNames = false;
+            nameToggleBtn.textContent = '이름 표시';
+          } else {
+            renderNoApplyList();
+          }
+        };
+
+        nameToggleBtn.onclick = () => {
           showNames = !showNames;
-          toggleBtn.textContent = showNames ? '이름 숨기기' : '이름 표시';
+          nameToggleBtn.textContent = showNames ? '이름 숨기기' : '이름 표시';
           renderNoApplyList();
         };
       } else {

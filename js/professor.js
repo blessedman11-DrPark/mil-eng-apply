@@ -637,17 +637,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('prof-no-apply-count').textContent = `(${noApply.length}명)`;
 
         let profShowNames = false;
+        let profListVisible = false;
+
+        const listEl = document.getElementById('prof-no-apply-list');
+        const nameToggleBtn = document.getElementById('prof-no-apply-name-toggle');
+        const sectionToggleBtn = document.getElementById('prof-no-apply-section-toggle');
+
         const renderProfNoApplyList = () => {
-          document.getElementById('prof-no-apply-list').textContent = profShowNames
+          listEl.textContent = profShowNames
             ? noApply.map(s => `${s.student_id} (${s.student_name})`).join(', ')
             : noApply.map(s => s.student_id).join(', ');
         };
-        renderProfNoApplyList();
 
-        const toggleBtn = document.getElementById('prof-no-apply-name-toggle');
-        toggleBtn.onclick = () => {
+        sectionToggleBtn.onclick = () => {
+          profListVisible = !profListVisible;
+          listEl.style.display = profListVisible ? '' : 'none';
+          sectionToggleBtn.textContent = profListVisible ? '숨기기' : '보기';
+          nameToggleBtn.style.display = profListVisible ? '' : 'none';
+          if (!profListVisible) {
+            profShowNames = false;
+            nameToggleBtn.textContent = '이름 표시';
+          } else {
+            renderProfNoApplyList();
+          }
+        };
+
+        nameToggleBtn.onclick = () => {
           profShowNames = !profShowNames;
-          toggleBtn.textContent = profShowNames ? '이름 숨기기' : '이름 표시';
+          nameToggleBtn.textContent = profShowNames ? '이름 숨기기' : '이름 표시';
           renderProfNoApplyList();
         };
       } else {
