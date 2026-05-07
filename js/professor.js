@@ -573,15 +573,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   async function loadStatistics() {
-    const [{ data: wh }, { data: wr }, { data: allStudents }, { data: subs }] = await Promise.all([
-      db.from(TABLES.WIN_HISTORY).select('*').order('win_count', { ascending: false }),
-      db.from(TABLES.WIN_RECORDS).select('*').order('won_at', { ascending: false }),
+    const [{ data: wr }, { data: rounds }, { data: allStudents }, { data: subs }] = await Promise.all([
+      db.from(TABLES.WIN_RECORDS).select('*').order('round_number').order('student_id'),
+      db.from(TABLES.ROUNDS).select('*').order('round_number', { ascending: false }),
       db.from(TABLES.STUDENTS).select('student_id, student_name').order('student_id'),
       db.from(TABLES.SUBMISSIONS).select('student_id'),
     ]);
 
-    // 학생별 누계
-    profWinHistoryData = wh || [];
+    // 학생별 누계: win_records에서 직접 집계 (source of truth)
+    const cumulativeMap = {};
+    (wr || []).forEach(r => {
+      if (!cumulativeMap[r.student_id]) {
+        cumulativeMap[r.student_id] = { student_name: r.student_name, win_count: 0, last_won_at: null };
+      }
+      cumulativeMap[r.student_id].win_count++;
+      if (!cumulativeMap[r.student_id].last_won_at || r.won_at > cumulativeMap[r.student_id].last_won_at) {
+        cumulativeMap[r.student_id].last_won_at = r.won_at;
+      }
+    });
+    profWinHistoryData = Object.entries(cumulativeMap).map(([student_id, v]) => ({
+      student_id, student_name: v.student_name, win_count: v.win_count, last_won_at: v.last_won_at,
+    }));
 
     if (!profWinHistoryData.length) {
       document.getElementById('prof-chart-empty').classList.remove('hidden');
@@ -594,42 +606,46 @@ document.addEventListener('DOMContentLoaded', async () => {
       renderProfRankTable();
     }
 
-    // 회차별 기록 (해당 요소가 있을 때만)
-    const wrEl = document.getElementById('stats-tbody-wr');
-    if (wrEl) {
-      if (!wr?.length) { empty('stats-tbody-wr', 5); }
-      else wrEl.innerHTML = wr.map(r => `<tr>
-        <td>${escHtml(r.round_number)}회차</td><td>${escHtml(r.student_id)}</td><td>${escHtml(r.student_name)}</td>
-        <td>${escHtml(r.assigned_sentence)}번</td><td>${fmt(r.won_at)}</td>
-      </tr>`).join('');
+    // 회차별 배정 기록
+    const roundsSec = document.getElementById('stats-rounds-section');
+    if (roundsSec) {
+      if (!rounds?.length) {
+        roundsSec.style.display = 'none';
+      } else {
+        roundsSec.style.display = '';
+        document.getElementById('stats-rounds-list').innerHTML = rounds.map(round => {
+          const recs = (wr || [])
+            .filter(r => r.round_id === round.id)
+            .sort((a, b) => a.assigned_sentence - b.assigned_sentence);
+          const tbody = recs.length
+            ? recs.map(r => `<tr>
+                <td>${escHtml(r.student_id)}</td>
+                <td>${escHtml(r.student_name)}</td>
+                <td style="text-align:center;font-weight:600">${escHtml(r.assigned_sentence)}번</td>
+              </tr>`).join('')
+            : `<tr><td colspan="3" class="text-muted text-center" style="padding:.75rem">기록 없음</td></tr>`;
+          return `<details class="accordion" style="margin-bottom:.5rem">
+            <summary style="font-size:.95rem">${escHtml(round.round_number)}회차 당첨자 목록 <span class="text-muted" style="font-size:.82rem;font-weight:400">(${recs.length}명${round.executed_at ? ' · ' + fmtDate(round.executed_at) : ''})</span></summary>
+            <div class="accordion-body">
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>학번</th><th>이름</th><th>배정 문장</th></tr></thead>
+                  <tbody>${tbody}</tbody>
+                </table>
+              </div>
+            </div>
+          </details>`;
+        }).join('');
+      }
     }
 
-    // 문장별 빈도
-    const sfEl = document.getElementById('stats-tbody-sf');
-    if (sfEl) {
-      const sf = {};
-      (wr || []).forEach(r => { sf[r.assigned_sentence] = (sf[r.assigned_sentence] || 0) + 1; });
-      const sfSorted = Object.entries(sf).sort((a, b) => b[1] - a[1]);
-      if (!sfSorted.length) { empty('stats-tbody-sf', 2); }
-      else sfEl.innerHTML = sfSorted.map(([n, c]) => `<tr><td>${n}번</td><td>${c}회</td></tr>`).join('');
-    }
-
-    // 월별
-    const moEl = document.getElementById('stats-tbody-mo');
-    if (moEl) {
-      const mo = {};
-      (wr || []).forEach(r => { mo[r.won_month] = (mo[r.won_month] || 0) + 1; });
-      const moSorted = Object.entries(mo).sort((a, b) => b[0].localeCompare(a[0]));
-      if (!moSorted.length) { empty('stats-tbody-mo', 2); }
-      else moEl.innerHTML = moSorted.map(([m, c]) => `<tr><td>${m}</td><td>${c}건</td></tr>`).join('');
-    }
-
-    // ── 미신청: students에서 submissions·win_history 모두에 없는 학생 ──
+    // ── 미신청: students에서 submissions·win_records 모두에 없는 학생 ──
+    const wonIds = new Set((wr || []).map(r => String(r.student_id)));
     const noApplySec = document.getElementById('prof-no-apply-section');
     if (allStudents?.length) {
       const appliedIds = new Set([
         ...(subs || []).map(s => String(s.student_id)),
-        ...(wh || []).map(h => String(h.student_id)),
+        ...wonIds,
       ]);
       const noApply = allStudents.filter(s => !appliedIds.has(String(s.student_id)));
       if (noApply.length) {

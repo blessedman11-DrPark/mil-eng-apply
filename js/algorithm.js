@@ -177,8 +177,9 @@ async function runAssignment() {
       await db.from(TABLES.WIN_RECORDS).insert(winRecordRows);
     }
 
-    // 6d. is_assigned = true
+    // 6d. is_assigned = true, 회차 실행 시각 기록
     await db.from(TABLES.SETTINGS).update({ is_assigned: true }).eq('id', 1);
+    await db.from(TABLES.ROUNDS).update({ executed_at: now.toISOString() }).eq('id', currentRound.id);
 
     const failedCount = submissions.length - assignedStudents.length;
     const msg = failedCount > 0
