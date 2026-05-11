@@ -20,20 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 280); }, 3200);
   }
 
-  function fmt(iso) {
-    if (!iso) return '-';
-    const d = new Date(iso.includes('+') || iso.endsWith('Z') ? iso : iso + '+09:00');
-    return d.toLocaleString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-  }
-  function fmtDate(iso) {
-    if (!iso) return '-';
-    return new Date(iso.includes('+') || iso.endsWith('Z') ? iso : iso + '+09:00').toLocaleDateString('ko-KR');
-  }
-  function empty(tbodyId, cols, msg = '데이터가 없습니다') {
-    document.getElementById(tbodyId).innerHTML =
-      `<tr><td colspan="${cols}" class="text-center text-muted" style="padding:1rem">${msg}</td></tr>`;
-  }
-
   // ════════ 확인 모달 ════════
   const confirmModal = document.getElementById('confirm-modal');
   let pendingConfirm = null;
