@@ -529,22 +529,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const wb = XLSX.utils.book_new();
 
-      // 시트1: 회차 기록
+      // 시트1: 회차 기록 (_실행일시 = ISO, 복원용)
       XLSX.utils.book_append_sheet(wb, makeSheet(
-        ['회차', '실행 일시'],
-        (rounds || []).map(r => [getRoundLabel(r.round_number), fmt(r.executed_at)])
+        ['회차', '실행 일시', '_실행일시'],
+        (rounds || []).map(r => [getRoundLabel(r.round_number), fmt(r.executed_at), r.executed_at || ''])
       ), '회차 기록');
 
-      // 시트2: 당첨 기록
+      // 시트2: 당첨 기록 (_당첨일시 = ISO, 복원용)
       XLSX.utils.book_append_sheet(wb, makeSheet(
-        ['회차', '학번', '이름', '배정 문장', '당첨 일시'],
-        (winRecords || []).map(r => [getRoundLabel(r.round_number), r.student_id, r.student_name, r.assigned_sentence + '번', fmt(r.won_at)])
+        ['회차', '학번', '이름', '배정 문장', '당첨 일시', '_당첨일시'],
+        (winRecords || []).map(r => [getRoundLabel(r.round_number), r.student_id, r.student_name, r.assigned_sentence != null ? r.assigned_sentence + '번' : '-', fmt(r.won_at), r.won_at || ''])
       ), '당첨 기록');
 
-      // 시트3: 당첨 누계
+      // 시트3: 당첨 누계 (_마지막당첨일 = ISO, 복원용)
       XLSX.utils.book_append_sheet(wb, makeSheet(
-        ['학번', '이름', '총 당첨 횟수', '마지막 당첨일'],
-        (winHistory || []).map(h => [h.student_id, h.student_name, h.win_count, fmtDate(h.last_won_at)])
+        ['학번', '이름', '총 당첨 횟수', '마지막 당첨일', '_마지막당첨일'],
+        (winHistory || []).map(h => [h.student_id, h.student_name, h.win_count, fmtDate(h.last_won_at), h.last_won_at || ''])
       ), '당첨 누계');
 
       // 시트4: 현재 제출 데이터
@@ -641,10 +641,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // 회차 번호 목록 (회차 시트 우선, 없으면 당첨기록에서 추출)
-      const roundNums = roundRows.length
-        ? roundRows.map(r => parseRound(r[0])).filter(Boolean)
-        : [...new Set(wrRows.map(r => parseRound(r[0])).filter(Boolean))].sort((a, b) => a - b);
+      // 회차 데이터 (번호 + 실행일시) — 회차 시트 우선, 없으면 당첨기록에서 추출
+      const roundsToRestore = roundRows.length
+        ? roundRows.map(r => ({ num: parseRound(r[0]), executedAt: toStr(r[2]) || null })).filter(r => r.num)
+        : [...new Set(wrRows.map(r => parseRound(r[0])).filter(Boolean))].sort((a, b) => a - b).map(num => ({ num, executedAt: null }));
+      const roundNums = roundsToRestore.map(r => r.num);
 
       const ok = await showConfirm({
         title: '백업 파일로 복원',
@@ -663,25 +664,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       ]);
       await db.from(TABLES.ROUNDS).delete().neq('id', 0);
 
-      // 2. 회차 순서대로 삽입 (win_records FK용 ID 확보)
+      // 2. 회차 순서대로 삽입 (win_records FK용 ID 확보, executed_at 포함)
       const roundNumToId = {};
-      for (const num of roundNums) {
+      const roundNumToAt = {};
+      for (const { num, executedAt } of roundsToRestore) {
         const { data } = await db.from(TABLES.ROUNDS)
-          .insert({ round_number: num }).select('id').single();
-        if (data) roundNumToId[num] = data.id;
+          .insert({ round_number: num, executed_at: executedAt }).select('id').single();
+        if (data) { roundNumToId[num] = data.id; roundNumToAt[num] = executedAt; }
       }
 
-      // 3. 당첨 누계 삽입
+      // 3. 당첨 누계 삽입 (_마지막당첨일 ISO 열: index 4)
       if (whRows.length) {
         await db.from(TABLES.WIN_HISTORY).insert(whRows.map(r => ({
           student_id:   toStr(r[0]),
           student_name: toStr(r[1]),
           win_count:    parseNum(r[2]) ?? 0,
-          last_won_at:  null,
+          last_won_at:  toStr(r[4]) || null,
         })));
       }
 
-      // 4. 당첨 기록 삽입
+      // 4. 당첨 기록 삽입 (_당첨일시 ISO 열: index 5)
       if (wrRows.length) {
         const toInsert = wrRows.map(r => {
           const rn = parseRound(r[0]);
@@ -690,8 +692,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             round_number:      rn,
             student_id:        toStr(r[1]),
             student_name:      toStr(r[2]),
-            assigned_sentence: parseNum(r[3]),  // "5번" → 5
-            won_at:            null,
+            assigned_sentence: parseNum(r[3]),
+            won_at:            toStr(r[5]) || roundNumToAt[rn] || null,
           };
         }).filter(r => r.round_id && r.student_id);
         if (toInsert.length) await db.from(TABLES.WIN_RECORDS).insert(toInsert);
