@@ -1026,17 +1026,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         roundsSec.style.display = 'none';
       } else {
         roundsSec.style.display = '';
-        document.getElementById('stats-rounds-list').innerHTML = rounds.map(round => {
+        const roundsWithWinners = (rounds || []).filter(round =>
+          (wr || []).some(r => r.round_id === round.id)
+        );
+        if (!roundsWithWinners.length) { roundsSec.style.display = 'none'; return; }
+        document.getElementById('stats-rounds-list').innerHTML = roundsWithWinners.map(round => {
           const recs = (wr || [])
             .filter(r => r.round_id === round.id)
             .sort((a, b) => a.assigned_sentence - b.assigned_sentence);
-          const tbody = recs.length
-            ? recs.map(r => `<tr>
+          const tbody = recs.map(r => `<tr>
                 <td>${escHtml(r.student_id)}</td>
                 <td>${escHtml(r.student_name)}</td>
-                <td style="text-align:center;font-weight:600">${escHtml(r.assigned_sentence)}번</td>
-              </tr>`).join('')
-            : `<tr><td colspan="3" class="text-muted text-center" style="padding:.75rem">기록 없음</td></tr>`;
+                <td style="text-align:center;font-weight:600">${r.assigned_sentence != null ? escHtml(r.assigned_sentence) + '번' : '-'}</td>
+              </tr>`).join('');
           return `<details class="accordion" style="margin-bottom:.5rem">
             <summary style="font-size:.95rem">${getRoundLabel(round.round_number)} 당첨자 목록 <span class="text-muted" style="font-size:.82rem;font-weight:400">(${recs.length}명${round.executed_at ? ' · ' + fmtDate(round.executed_at) : ''})</span></summary>
             <div class="accordion-body">
