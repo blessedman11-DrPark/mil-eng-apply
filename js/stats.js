@@ -9,12 +9,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function fmt(iso) {
     if (!iso) return '-';
-    const d = new Date(iso.endsWith('Z') ? iso : iso + 'Z');
+    const d = new Date(iso.includes('+') || iso.endsWith('Z') ? iso : iso + 'Z');
     return d.toLocaleString('ko-KR', { year: '2-digit', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
   }
   function fmtDate(iso) {
     if (!iso) return '-';
-    return new Date(iso.endsWith('Z') ? iso : iso + 'Z').toLocaleDateString('ko-KR');
+    return new Date(iso.includes('+') || iso.endsWith('Z') ? iso : iso + 'Z').toLocaleDateString('ko-KR');
   }
   function empty(tbodyId, cols) {
     document.getElementById(tbodyId).innerHTML =
