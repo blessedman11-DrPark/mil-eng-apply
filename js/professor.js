@@ -219,6 +219,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     showToast('전체 삭제되었습니다.', 'success');
   });
 
+  document.getElementById('recalc-wh-btn').addEventListener('click', async () => {
+    const ok = await showConfirm({
+      title: '당첨 누계 재계산',
+      message: '당첨 기록(win_records)을 기준으로 누계를 다시 계산합니다. 현재 누계 데이터는 모두 교체됩니다. 계속하시겠습니까?',
+      danger: false,
+    });
+    if (!ok) return;
+
+    const { data: wr, error } = await db.from(TABLES.WIN_RECORDS).select('student_id, student_name, won_at');
+    if (error) { showToast('기록 조회 실패: ' + error.message, 'error'); return; }
+
+    // win_records 기준으로 학생별 집계
+    const countMap = {}, nameMap = {}, lastWonMap = {};
+    (wr || []).forEach(r => {
+      const sid = String(r.student_id);
+      countMap[sid] = (countMap[sid] || 0) + 1;
+      nameMap[sid]  = r.student_name;
+      if (r.won_at && (!lastWonMap[sid] || r.won_at > lastWonMap[sid])) {
+        lastWonMap[sid] = r.won_at;
+      }
+    });
+
+    // 기존 누계 전체 삭제 후 재삽입
+    await db.from(TABLES.WIN_HISTORY).delete().gte('win_count', 0);
+    const rows = Object.keys(countMap).map(sid => ({
+      student_id:   sid,
+      student_name: nameMap[sid],
+      win_count:    countMap[sid],
+      last_won_at:  lastWonMap[sid] || null,
+    }));
+    if (rows.length) await db.from(TABLES.WIN_HISTORY).insert(rows);
+
+    await loadWhAccordion();
+    showToast(`재계산 완료: ${rows.length}명 업데이트`, 'success');
+  });
+
   // ── 아코디언: 당첨 기록 ──
   let allWinRecords = [];
   let wrRoundsCache = [];
