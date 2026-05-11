@@ -221,27 +221,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── 아코디언: 당첨 기록 ──
   let allWinRecords = [];
+  let wrRoundsCache = [];
+  let wrStudentsCache = [];
   document.getElementById('accordion-win-records').addEventListener('toggle', function() {
     if (this.open) loadWrAccordion();
   });
   async function loadWrAccordion() {
-    const [{ data: wr }, { data: rounds }] = await Promise.all([
+    const [{ data: wr }, { data: rounds }, { data: students }] = await Promise.all([
       db.from(TABLES.WIN_RECORDS).select('*').order('won_at', { ascending: false }),
-      db.from(TABLES.ROUNDS).select('id,round_number').order('round_number'),
+      db.from(TABLES.ROUNDS).select('*').order('round_number'),
+      db.from(TABLES.STUDENTS).select('student_id,student_name').order('student_id'),
     ]);
     allWinRecords = wr || [];
+    wrRoundsCache = rounds || [];
+    wrStudentsCache = students || [];
     const filter = document.getElementById('wr-round-filter');
     filter.innerHTML = '<option value="">전체 회차</option>' +
-      (rounds || []).map(r => `<option value="${r.id}">${getRoundLabel(r.round_number)}</option>`).join('');
+      wrRoundsCache.map(r => `<option value="${r.id}">${getRoundLabel(r.round_number)}</option>`).join('');
     renderWrTable(allWinRecords);
     bindCheckAll('chk-all-wr', '.wr-ck');
   }
   function renderWrTable(records) {
-    if (!records.length) { empty('tbody-win-records', 6); return; }
+    if (!records.length) { empty('tbody-win-records', 7); return; }
     document.getElementById('tbody-win-records').innerHTML = records.map(r => `<tr>
       <td><input type="checkbox" class="row-check wr-ck" data-id="${escHtml(r.id)}"/></td>
       <td>${getRoundLabel(r.round_number)}</td><td>${escHtml(r.student_id)}</td><td>${escHtml(r.student_name)}</td>
-      <td>${escHtml(r.assigned_sentence)}번</td><td>${fmt(r.won_at)}</td>
+      <td>${r.assigned_sentence != null ? escHtml(r.assigned_sentence) + '번' : '-'}</td><td>${fmt(r.won_at)}</td>
+      <td><button class="btn btn-sm btn-secondary wr-edit-btn" data-id="${r.id}" style="white-space:nowrap">✏️ 편집</button></td>
     </tr>`).join('');
     bindCheckAll('chk-all-wr', '.wr-ck');
   }
@@ -270,6 +276,139 @@ document.addEventListener('DOMContentLoaded', async () => {
     await db.from(TABLES.WIN_RECORDS).delete().neq('id', 0);
     await loadWrAccordion();
     showToast('전체 삭제되었습니다.', 'success');
+  });
+
+  // ── 당첨 기록 추가/편집 모달 ──
+  let wrEditTarget = null;
+  const wrEditModal = document.getElementById('wr-edit-modal');
+
+  function openWrModal(record = null) {
+    wrEditTarget = record;
+    document.getElementById('wr-edit-title').textContent = record ? '당첨 기록 편집' : '당첨 기록 추가';
+
+    const roundSel = document.getElementById('wr-modal-round');
+    roundSel.innerHTML = wrRoundsCache.map(r =>
+      `<option value="${r.id}" data-num="${r.round_number}" data-at="${r.executed_at || ''}">${getRoundLabel(r.round_number)}</option>`
+    ).join('');
+
+    const studentSel = document.getElementById('wr-modal-student');
+    studentSel.innerHTML = wrStudentsCache.length
+      ? wrStudentsCache.map(s =>
+          `<option value="${escHtml(s.student_id)}">${escHtml(s.student_id)} ${escHtml(s.student_name)}</option>`
+        ).join('')
+      : '<option value="">학생 목록이 없습니다</option>';
+
+    if (record) {
+      roundSel.value = record.round_id;
+      studentSel.value = record.student_id;
+      document.getElementById('wr-modal-sentence').value = record.assigned_sentence ?? '';
+    } else {
+      document.getElementById('wr-modal-sentence').value = '';
+    }
+    wrEditModal.classList.add('open');
+  }
+
+  function closeWrModal() {
+    wrEditModal.classList.remove('open');
+    wrEditTarget = null;
+  }
+
+  document.getElementById('wr-modal-cancel').addEventListener('click', closeWrModal);
+  wrEditModal.addEventListener('click', e => { if (e.target === wrEditModal) closeWrModal(); });
+
+  document.getElementById('wr-modal-save').addEventListener('click', async () => {
+    const roundId  = parseInt(document.getElementById('wr-modal-round').value);
+    const studentId = document.getElementById('wr-modal-student').value;
+    const sentence = parseInt(document.getElementById('wr-modal-sentence').value) || null;
+
+    if (!roundId || !studentId) { showToast('회차와 학생을 선택해주세요.', 'error'); return; }
+
+    const round   = wrRoundsCache.find(r => r.id === roundId);
+    const student = wrStudentsCache.find(s => s.student_id === studentId);
+    const studentName = student?.student_name ?? studentId;
+    const wonAt   = round?.executed_at || null;
+
+    const saveBtn = document.getElementById('wr-modal-save');
+    saveBtn.disabled = true;
+    try {
+      if (!wrEditTarget) {
+        // ── 추가 ──
+        const { error } = await db.from(TABLES.WIN_RECORDS).insert({
+          round_id: roundId, round_number: round.round_number,
+          student_id: studentId, student_name: studentName,
+          assigned_sentence: sentence, won_at: wonAt,
+        });
+        if (error) throw error;
+
+        // win_history 증가
+        const { data: hist } = await db.from(TABLES.WIN_HISTORY)
+          .select('*').eq('student_id', studentId).maybeSingle();
+        if (hist) {
+          await db.from(TABLES.WIN_HISTORY).update({
+            win_count: hist.win_count + 1,
+            last_won_at: wonAt || hist.last_won_at,
+          }).eq('student_id', studentId);
+        } else {
+          await db.from(TABLES.WIN_HISTORY).insert({
+            student_id: studentId, student_name: studentName,
+            win_count: 1, last_won_at: wonAt,
+          });
+        }
+        showToast('당첨 기록이 추가되었습니다.', 'success');
+
+      } else {
+        // ── 편집 ──
+        const oldStudentId = wrEditTarget.student_id;
+        await db.from(TABLES.WIN_RECORDS).update({
+          round_id: roundId, round_number: round.round_number,
+          student_id: studentId, student_name: studentName,
+          assigned_sentence: sentence, won_at: wonAt || wrEditTarget.won_at,
+        }).eq('id', wrEditTarget.id);
+
+        // 학생이 바뀐 경우 win_history 조정
+        if (studentId !== oldStudentId) {
+          const { data: oldHist } = await db.from(TABLES.WIN_HISTORY)
+            .select('*').eq('student_id', oldStudentId).maybeSingle();
+          if (oldHist) {
+            if (oldHist.win_count <= 1) {
+              await db.from(TABLES.WIN_HISTORY).delete().eq('student_id', oldStudentId);
+            } else {
+              await db.from(TABLES.WIN_HISTORY).update({ win_count: oldHist.win_count - 1 }).eq('student_id', oldStudentId);
+            }
+          }
+          const { data: newHist } = await db.from(TABLES.WIN_HISTORY)
+            .select('*').eq('student_id', studentId).maybeSingle();
+          if (newHist) {
+            await db.from(TABLES.WIN_HISTORY).update({
+              win_count: newHist.win_count + 1,
+              last_won_at: wonAt || newHist.last_won_at,
+            }).eq('student_id', studentId);
+          } else {
+            await db.from(TABLES.WIN_HISTORY).insert({
+              student_id: studentId, student_name: studentName,
+              win_count: 1, last_won_at: wonAt,
+            });
+          }
+        }
+        showToast('수정되었습니다.', 'success');
+      }
+
+      closeWrModal();
+      await loadWrAccordion();
+    } catch (e) {
+      showToast('저장 실패: ' + e.message, 'error');
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  document.getElementById('add-wr-btn').addEventListener('click', () => openWrModal(null));
+
+  document.getElementById('tbody-win-records').addEventListener('click', e => {
+    const btn = e.target.closest('.wr-edit-btn');
+    if (!btn) return;
+    const record = allWinRecords.find(r => r.id === parseInt(btn.dataset.id));
+    if (record) openWrModal(record);
   });
 
   // ── 아코디언: 회차 기록 ──
