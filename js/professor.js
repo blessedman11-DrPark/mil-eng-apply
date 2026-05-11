@@ -655,13 +655,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       importBtn.textContent = '복원 중...';
 
-      // 1. 기존 데이터 전체 삭제
+      // 1. 기존 데이터 전체 삭제 (win_records → rounds FK 순서 보장)
       await Promise.all([
         db.from(TABLES.SUBMISSIONS).delete().neq('id', 0),
         db.from(TABLES.WIN_HISTORY).delete().neq('student_id', ''),
         db.from(TABLES.WIN_RECORDS).delete().neq('id', 0),
-        db.from(TABLES.ROUNDS).delete().neq('id', 0),
       ]);
+      await db.from(TABLES.ROUNDS).delete().neq('id', 0);
 
       // 2. 회차 순서대로 삽입 (win_records FK용 ID 확보)
       const roundNumToId = {};
