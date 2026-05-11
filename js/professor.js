@@ -321,6 +321,121 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ════════════════════════════════════════════════════════════
+  // 데이터 내보내기
+  // ════════════════════════════════════════════════════════════
+  function makeSheet(headers, rows) {
+    return XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  }
+
+  function todayStr() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}${m}${day}`;
+  }
+
+  async function exportAll() {
+    const btn = document.getElementById('export-all-btn');
+    btn.disabled = true;
+    btn.textContent = '불러오는 중...';
+    try {
+      const [
+        { data: rounds },
+        { data: winRecords },
+        { data: winHistory },
+        { data: submissions },
+      ] = await Promise.all([
+        db.from(TABLES.ROUNDS).select('*').order('round_number'),
+        db.from(TABLES.WIN_RECORDS).select('*').order('round_number').order('student_id'),
+        db.from(TABLES.WIN_HISTORY).select('*').order('win_count', { ascending: false }).order('student_id'),
+        db.from(TABLES.SUBMISSIONS).select('*').order('student_id'),
+      ]);
+
+      const wb = XLSX.utils.book_new();
+
+      // 시트1: 회차 기록
+      XLSX.utils.book_append_sheet(wb, makeSheet(
+        ['회차', '실행 일시'],
+        (rounds || []).map(r => [getRoundLabel(r.round_number), fmt(r.executed_at)])
+      ), '회차 기록');
+
+      // 시트2: 당첨 기록
+      XLSX.utils.book_append_sheet(wb, makeSheet(
+        ['회차', '학번', '이름', '배정 문장', '당첨 일시'],
+        (winRecords || []).map(r => [getRoundLabel(r.round_number), r.student_id, r.student_name, r.assigned_sentence + '번', fmt(r.won_at)])
+      ), '당첨 기록');
+
+      // 시트3: 당첨 누계
+      XLSX.utils.book_append_sheet(wb, makeSheet(
+        ['학번', '이름', '총 당첨 횟수', '마지막 당첨일'],
+        (winHistory || []).map(h => [h.student_id, h.student_name, h.win_count, fmtDate(h.last_won_at)])
+      ), '당첨 누계');
+
+      // 시트4: 현재 제출 데이터
+      XLSX.utils.book_append_sheet(wb, makeSheet(
+        ['학번', '이름', '1지망', '2지망', '3지망', '배정 문장', '제출 일시'],
+        (submissions || []).map(s => [
+          s.student_id, s.student_name,
+          s.choice1 ?? '', s.choice2 ?? '', s.choice3 ?? '',
+          s.assigned_sentence != null ? s.assigned_sentence + '번' : '미배정',
+          fmt(s.created_at),
+        ])
+      ), '현재 제출');
+
+      XLSX.writeFile(wb, `군사영어_전체데이터_${todayStr()}.xlsx`);
+      showToast('다운로드 완료!', 'success');
+    } catch (e) {
+      showToast('내보내기 실패: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '📥 전체 데이터 내보내기';
+    }
+  }
+
+  async function exportWinRecords() {
+    const btn = document.getElementById('export-wr-btn');
+    btn.disabled = true;
+    try {
+      const { data: winRecords } = await db.from(TABLES.WIN_RECORDS).select('*').order('round_number').order('student_id');
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, makeSheet(
+        ['회차', '학번', '이름', '배정 문장', '당첨 일시'],
+        (winRecords || []).map(r => [getRoundLabel(r.round_number), r.student_id, r.student_name, r.assigned_sentence + '번', fmt(r.won_at)])
+      ), '당첨 기록');
+      XLSX.writeFile(wb, `군사영어_당첨기록_${todayStr()}.xlsx`);
+      showToast('다운로드 완료!', 'success');
+    } catch (e) {
+      showToast('내보내기 실패: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function exportWinHistory() {
+    const btn = document.getElementById('export-wh-btn');
+    btn.disabled = true;
+    try {
+      const { data: winHistory } = await db.from(TABLES.WIN_HISTORY).select('*').order('win_count', { ascending: false }).order('student_id');
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, makeSheet(
+        ['학번', '이름', '총 당첨 횟수', '마지막 당첨일'],
+        (winHistory || []).map(h => [h.student_id, h.student_name, h.win_count, fmtDate(h.last_won_at)])
+      ), '당첨 누계');
+      XLSX.writeFile(wb, `군사영어_당첨누계_${todayStr()}.xlsx`);
+      showToast('다운로드 완료!', 'success');
+    } catch (e) {
+      showToast('내보내기 실패: ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  document.getElementById('export-all-btn').addEventListener('click', exportAll);
+  document.getElementById('export-wr-btn').addEventListener('click', exportWinRecords);
+  document.getElementById('export-wh-btn').addEventListener('click', exportWinHistory);
+
+  // ════════════════════════════════════════════════════════════
   // 탭2: 현황 (Realtime)
   // ════════════════════════════════════════════════════════════
 

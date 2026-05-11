@@ -8,6 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <header>
@@ -144,6 +145,17 @@
           </div>
         </div>
       </details>
+    </div>
+
+    <!-- 데이터 내보내기 -->
+    <div class="section-card">
+      <h2>데이터 내보내기</h2>
+      <p class="text-muted" style="margin-bottom:1rem;font-size:.9rem">DB에 저장된 모든 자료를 Excel 파일(.xlsx)로 내 PC에 저장합니다.</p>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+        <button class="btn btn-primary" id="export-all-btn">📥 전체 데이터 내보내기</button>
+        <button class="btn btn-secondary btn-sm" id="export-wr-btn">당첨 기록만</button>
+        <button class="btn btn-secondary btn-sm" id="export-wh-btn">당첨 누계만</button>
+      </div>
     </div>
 
     <!-- 전체 초기화 -->
