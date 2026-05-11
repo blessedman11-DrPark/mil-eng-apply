@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!roundId || !studentId) { showToast('회차와 학생을 선택해주세요.', 'error'); return; }
 
     const round   = wrRoundsCache.find(r => r.id === roundId);
-    const student = wrStudentsCache.find(s => s.student_id === studentId);
+    const student = wrStudentsCache.find(s => String(s.student_id) === String(studentId));
     const studentName = student?.student_name ?? studentId;
     const wonAt   = round?.executed_at || null;
 
