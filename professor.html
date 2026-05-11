@@ -147,15 +147,26 @@
       </details>
     </div>
 
-    <!-- 데이터 내보내기 -->
+    <!-- 데이터 백업 / 복원 -->
     <div class="section-card">
-      <h2>데이터 내보내기</h2>
-      <p class="text-muted" style="margin-bottom:1rem;font-size:.9rem">DB에 저장된 모든 자료를 Excel 파일(.xlsx)로 내 PC에 저장합니다.</p>
+      <h2>데이터 백업 / 복원</h2>
+
+      <!-- 내보내기 -->
+      <p class="text-muted" style="margin-bottom:.75rem;font-size:.9rem">DB에 저장된 자료를 Excel 파일(.xlsx)로 내 PC에 저장합니다.</p>
       <div style="display:flex;gap:.75rem;flex-wrap:wrap">
         <button class="btn btn-primary" id="export-all-btn">📥 전체 데이터 내보내기</button>
         <button class="btn btn-secondary btn-sm" id="export-wr-btn">당첨 기록만</button>
         <button class="btn btn-secondary btn-sm" id="export-wh-btn">당첨 누계만</button>
       </div>
+
+      <!-- 불러오기 -->
+      <hr style="margin:1.25rem 0 1rem;border:none;border-top:1px solid #e2e8f0"/>
+      <p class="text-muted" style="margin-bottom:.5rem;font-size:.9rem">
+        이전에 내보낸 <b>전체 데이터 파일</b>을 선택하면 회차·당첨 기록·누계·제출 데이터가 복원됩니다.
+      </p>
+      <p style="font-size:.82rem;color:#e53e3e;margin-bottom:.75rem">⚠ 복원 시 현재 저장된 데이터가 모두 삭제된 후 덮어쓰입니다.</p>
+      <input type="file" id="import-file" accept=".xlsx" style="display:none"/>
+      <button class="btn btn-secondary" id="import-btn">📂 백업 파일로 복원</button>
     </div>
 
     <!-- 전체 초기화 -->

@@ -435,6 +435,129 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('export-wr-btn').addEventListener('click', exportWinRecords);
   document.getElementById('export-wh-btn').addEventListener('click', exportWinHistory);
 
+  // ── 데이터 불러오기 (복원) ──
+  async function importData(file) {
+    const importBtn = document.getElementById('import-btn');
+    importBtn.disabled = true;
+    importBtn.textContent = '파일 읽는 중...';
+    try {
+      const buffer = await file.arrayBuffer();
+      const wb = XLSX.read(buffer, { type: 'array' });
+
+      const parseNum   = v => (v !== undefined && v !== null && v !== '') ? (parseInt(v) || null) : null;
+      const parseRound = label => parseInt(String(label ?? '').match(/^(\d+)/)?.[1] || '') || null;
+      const toStr      = v => (v !== undefined && v !== null) ? String(v) : '';
+
+      const readSheet = name => {
+        const sheet = wb.Sheets[name];
+        if (!sheet) return [];
+        return XLSX.utils.sheet_to_json(sheet, { header: 1 })
+          .slice(1)
+          .filter(r => r.length && r[0] != null && r[0] !== '');
+      };
+
+      const roundRows = readSheet('회차 기록');
+      const wrRows    = readSheet('당첨 기록');
+      const whRows    = readSheet('당첨 누계');
+      const subRows   = readSheet('현재 제출');
+
+      if (!roundRows.length && !wrRows.length && !whRows.length) {
+        showToast('복원할 데이터가 없거나 올바른 백업 파일이 아닙니다.', 'error');
+        return;
+      }
+
+      // 회차 번호 목록 (회차 시트 우선, 없으면 당첨기록에서 추출)
+      const roundNums = roundRows.length
+        ? roundRows.map(r => parseRound(r[0])).filter(Boolean)
+        : [...new Set(wrRows.map(r => parseRound(r[0])).filter(Boolean))].sort((a, b) => a - b);
+
+      const ok = await showConfirm({
+        title: '백업 파일로 복원',
+        message: `회차 ${roundNums.length}건 · 당첨기록 ${wrRows.length}건 · 당첨누계 ${whRows.length}건 · 현재제출 ${subRows.length}건을 복원합니다. 현재 저장된 데이터가 모두 삭제됩니다. 계속하시겠습니까?`,
+        danger: true,
+      });
+      if (!ok) return;
+
+      importBtn.textContent = '복원 중...';
+
+      // 1. 기존 데이터 전체 삭제
+      await Promise.all([
+        db.from(TABLES.SUBMISSIONS).delete().neq('id', 0),
+        db.from(TABLES.WIN_HISTORY).delete().neq('student_id', ''),
+        db.from(TABLES.WIN_RECORDS).delete().neq('id', 0),
+        db.from(TABLES.ROUNDS).delete().neq('id', 0),
+      ]);
+
+      // 2. 회차 순서대로 삽입 (win_records FK용 ID 확보)
+      const roundNumToId = {};
+      for (const num of roundNums) {
+        const { data } = await db.from(TABLES.ROUNDS)
+          .insert({ round_number: num }).select('id').single();
+        if (data) roundNumToId[num] = data.id;
+      }
+
+      // 3. 당첨 누계 삽입
+      if (whRows.length) {
+        await db.from(TABLES.WIN_HISTORY).insert(whRows.map(r => ({
+          student_id:   toStr(r[0]),
+          student_name: toStr(r[1]),
+          win_count:    parseNum(r[2]) ?? 0,
+          last_won_at:  null,
+        })));
+      }
+
+      // 4. 당첨 기록 삽입
+      if (wrRows.length) {
+        const toInsert = wrRows.map(r => {
+          const rn = parseRound(r[0]);
+          return {
+            round_id:          roundNumToId[rn] ?? null,
+            round_number:      rn,
+            student_id:        toStr(r[1]),
+            student_name:      toStr(r[2]),
+            assigned_sentence: parseNum(r[3]),  // "5번" → 5
+            won_at:            null,
+          };
+        }).filter(r => r.round_id && r.student_id);
+        if (toInsert.length) await db.from(TABLES.WIN_RECORDS).insert(toInsert);
+      }
+
+      // 5. 현재 제출 삽입
+      if (subRows.length) {
+        const toInsert = subRows.map(r => ({
+          student_id:        toStr(r[0]),
+          student_name:      toStr(r[1]),
+          choice1:           parseNum(r[2]),
+          choice2:           parseNum(r[3]),
+          choice3:           parseNum(r[4]),
+          assigned_sentence: toStr(r[5]) === '미배정' ? null : parseNum(r[5]),
+        })).filter(r => r.student_id);
+        if (toInsert.length) await db.from(TABLES.SUBMISSIONS).insert(toInsert);
+      }
+
+      // 6. 설정 업데이트
+      const hasAssigned = subRows.some(r => r[5] && String(r[5]) !== '미배정');
+      await db.from(TABLES.SETTINGS).update({ is_assigned: hasAssigned, is_open: false }).eq('id', 1);
+      await loadSettings();
+
+      showToast(`복원 완료! 회차 ${roundNums.length}건 · 당첨기록 ${wrRows.length}건 · 당첨누계 ${whRows.length}건`, 'success');
+    } catch (e) {
+      showToast('복원 실패: ' + e.message, 'error');
+    } finally {
+      importBtn.disabled = false;
+      importBtn.textContent = '📂 백업 파일로 복원';
+      document.getElementById('import-file').value = '';
+    }
+  }
+
+  document.getElementById('import-btn').addEventListener('click', () => {
+    document.getElementById('import-file').click();
+  });
+  document.getElementById('import-file').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if (file) await importData(file);
+  });
+
   // ════════════════════════════════════════════════════════════
   // 탭2: 현황 (Realtime)
   // ════════════════════════════════════════════════════════════
