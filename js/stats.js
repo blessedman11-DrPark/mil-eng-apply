@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 드롭다운
     const sel = document.getElementById('round-select');
     sel.innerHTML = '<option value="">-- 회차를 선택하세요 --</option>' +
-      (rounds || []).map(r => `<option value="${r.id}">${r.round_number}회차 (${fmtDate(r.executed_at)})</option>`).join('');
+      (rounds || []).map(r => `<option value="${r.id}">${getRoundLabel(r.round_number)} (${fmtDate(r.executed_at)})</option>`).join('');
 
     // 회차 요약 테이블
     if (!rounds?.length) { empty('tbody-rounds-summary', 3); }
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const countMap = {};
       (wr || []).forEach(r => { countMap[r.round_id] = (countMap[r.round_id] || 0) + 1; });
       document.getElementById('tbody-rounds-summary').innerHTML = rounds.map(r => `<tr>
-        <td>${escHtml(r.round_number)}회차</td>
+        <td>${getRoundLabel(r.round_number)}</td>
         <td>${fmtDate(r.executed_at)}</td>
         <td>${escHtml(countMap[r.id] || 0)}명</td>
       </tr>`).join('');
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       detailSec.style.display = '';
       document.getElementById('round-detail-title').textContent =
-        `${round?.round_number}회차 당첨자 목록`;
+        `${getRoundLabel(round?.round_number)} 당첨자 목록`;
 
       if (!records?.length) { empty('tbody-round-detail', 4); return; }
       document.getElementById('tbody-round-detail').innerHTML = records.map(r => `<tr>

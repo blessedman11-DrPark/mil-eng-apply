@@ -8,3 +8,9 @@ const PROFESSOR_PASSWORD = 'null_password';
 
 // 한 학생이 선택할 수 있는 문장 수
 const MAX_SELECTIONS = 1;
+
+// 회차 → 주차 매핑 (표시 레이블용)
+const ROUND_WEEK_MAP = { 1: 6, 2: 7, 4: 10 };
+function getRoundLabel(n) {
+  return ROUND_WEEK_MAP[n] ? `${n}회차(${ROUND_WEEK_MAP[n]}주차)` : `${n}회차`;
+}

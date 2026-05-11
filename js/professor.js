@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { data: rounds } = await db.from(TABLES.ROUNDS).select('round_number')
       .order('round_number', { ascending: false }).limit(1);
     document.getElementById('current-round-info').textContent =
-      rounds?.[0] ? `현재 ${rounds[0].round_number}회차` : '회차 없음 (새 회차를 시작해주세요)';
+      rounds?.[0] ? `현재 ${getRoundLabel(rounds[0].round_number)}` : '회차 없음 (새 회차를 시작해주세요)';
   }
 
   document.getElementById('save-settings-btn').addEventListener('click', async () => {
@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     allWinRecords = wr || [];
     const filter = document.getElementById('wr-round-filter');
     filter.innerHTML = '<option value="">전체 회차</option>' +
-      (rounds || []).map(r => `<option value="${r.id}">${r.round_number}회차</option>`).join('');
+      (rounds || []).map(r => `<option value="${r.id}">${getRoundLabel(r.round_number)}</option>`).join('');
     renderWrTable(allWinRecords);
     bindCheckAll('chk-all-wr', '.wr-ck');
   }
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!records.length) { empty('tbody-win-records', 6); return; }
     document.getElementById('tbody-win-records').innerHTML = records.map(r => `<tr>
       <td><input type="checkbox" class="row-check wr-ck" data-id="${escHtml(r.id)}"/></td>
-      <td>${escHtml(r.round_number)}회차</td><td>${escHtml(r.student_id)}</td><td>${escHtml(r.student_name)}</td>
+      <td>${getRoundLabel(r.round_number)}</td><td>${escHtml(r.student_id)}</td><td>${escHtml(r.student_name)}</td>
       <td>${escHtml(r.assigned_sentence)}번</td><td>${fmt(r.won_at)}</td>
     </tr>`).join('');
     bindCheckAll('chk-all-wr', '.wr-ck');
@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!data?.length) { empty('tbody-rounds', 3); return; }
     document.getElementById('tbody-rounds').innerHTML = data.map(r => `<tr>
       <td><input type="checkbox" class="row-check rd-ck" data-id="${escHtml(r.id)}"/></td>
-      <td>${escHtml(r.round_number)}회차</td><td>${fmt(r.executed_at)}</td>
+      <td>${getRoundLabel(r.round_number)}</td><td>${fmt(r.executed_at)}</td>
     </tr>`).join('');
     bindCheckAll('chk-all-rd', '.rd-ck');
   }
@@ -625,7 +625,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               </tr>`).join('')
             : `<tr><td colspan="3" class="text-muted text-center" style="padding:.75rem">기록 없음</td></tr>`;
           return `<details class="accordion" style="margin-bottom:.5rem">
-            <summary style="font-size:.95rem">${escHtml(round.round_number)}회차 당첨자 목록 <span class="text-muted" style="font-size:.82rem;font-weight:400">(${recs.length}명${round.executed_at ? ' · ' + fmtDate(round.executed_at) : ''})</span></summary>
+            <summary style="font-size:.95rem">${getRoundLabel(round.round_number)} 당첨자 목록 <span class="text-muted" style="font-size:.82rem;font-weight:400">(${recs.length}명${round.executed_at ? ' · ' + fmtDate(round.executed_at) : ''})</span></summary>
             <div class="accordion-body">
               <div class="table-wrap">
                 <table>
