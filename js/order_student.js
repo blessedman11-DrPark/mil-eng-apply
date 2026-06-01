@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let html = '';
     for (let n = 1; n <= total; n++) {
       if (taken.has(n)) {
-        html += `<button type="button" class="order-chip taken" disabled>${n} <span aria-hidden="true">✕</span></button>`;
+        html += `<button type="button" class="order-chip taken" disabled>${n}</button>`;
       } else {
         remainingCount++;
         html += `<button type="button" class="order-chip" data-n="${n}">${n}</button>`;
