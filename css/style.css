@@ -15,6 +15,14 @@ header h1 { font-size: 1.15rem; font-weight: 700; }
 
 /* ===== Nav Cards ===== */
 .nav-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-top: 2rem; }
+
+/* ===== 메인 그룹 박스 ===== */
+.nav-group { border-radius: 16px; padding: 1.1rem 1.25rem 1.4rem; margin-top: 1.5rem; }
+.nav-group-student { background: #eef4ff; }
+.nav-group-prof { background: #eef7f0; }
+.nav-group-title { font-size: 1rem; font-weight: 700; color: #3a4256; margin: .15rem .25rem 1rem; }
+.nav-group .nav-cards { margin-top: 0; }
+.nav-cards-single { max-width: 320px; margin-left: auto; margin-right: auto; margin-top: 1.5rem; }
 .card { background: #fff; border-radius: 12px; padding: 2rem 1.5rem; text-align: center; color: #1a1a2e; box-shadow: 0 2px 12px rgba(0,0,0,.09); transition: transform .15s, box-shadow .15s; cursor: pointer; border: none; font-family: inherit; width: 100%; }
 .card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,.14); }
 .card .card-icon { font-size: 2.25rem; margin-bottom: .75rem; }

@@ -15,33 +15,50 @@
 </header>
 
 <main class="container">
-  <div class="nav-cards">
-    <button class="card" onclick="location.href='student.html'">
-      <div class="card-icon">📝</div>
-      <h2>학생</h2>
-      <p>문장 신청하기</p>
-    </button>
-    <button class="card" onclick="location.href='order_student.html'">
-      <div class="card-icon">🔢</div>
-      <h2>발표 순서</h2>
-      <p>발표 순번 신청하기</p>
-    </button>
-    <button class="card" id="btn-professor">
-      <div class="card-icon">👨‍🏫</div>
-      <h2>교수</h2>
-      <p>대시보드 접속</p>
-    </button>
-    <button class="card" id="btn-order-prof">
-      <div class="card-icon">🗂️</div>
-      <h2>발표 순서 관리</h2>
-      <p>교수 · 순번 현황</p>
-    </button>
+
+  <!-- 학생용 그룹 -->
+  <section class="nav-group nav-group-student">
+    <h2 class="nav-group-title">🎓 학생용</h2>
+    <div class="nav-cards">
+      <button class="card" onclick="location.href='student.html'">
+        <div class="card-icon">📝</div>
+        <h2>문장 신청</h2>
+        <p>문장 신청하기</p>
+      </button>
+      <button class="card" onclick="location.href='order_student.html'">
+        <div class="card-icon">🔢</div>
+        <h2>발표 순서</h2>
+        <p>발표 순번 신청하기</p>
+      </button>
+    </div>
+  </section>
+
+  <!-- 교수용 그룹 -->
+  <section class="nav-group nav-group-prof">
+    <h2 class="nav-group-title">👨‍🏫 교수용</h2>
+    <div class="nav-cards">
+      <button class="card" id="btn-professor">
+        <div class="card-icon">📋</div>
+        <h2>대시보드</h2>
+        <p>대시보드 접속</p>
+      </button>
+      <button class="card" id="btn-order-prof">
+        <div class="card-icon">🗂️</div>
+        <h2>발표 순서 관리</h2>
+        <p>교수 · 순번 현황</p>
+      </button>
+    </div>
+  </section>
+
+  <!-- 통계 -->
+  <div class="nav-cards nav-cards-single">
     <button class="card" id="btn-stats">
       <div class="card-icon">📊</div>
       <h2>통계 보기</h2>
       <p>배정 현황 확인</p>
     </button>
   </div>
+
 </main>
 
 <!-- 통계 암호 모달 -->
