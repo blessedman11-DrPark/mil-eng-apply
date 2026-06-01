@@ -255,18 +255,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       .select('order_total').single();
     total = settings?.order_total || 22;
 
-    const { sid } = getIdentity();
-
-    if (sid) {
-      // 이미 본인 확인 완료 — 이미 신청했으면 결과, 아니면 대기 화면
-      const claims = await fetchClaims();
-      const mine = claims.find(c => c.student_id === sid);
-      if (mine) { showDone(mine.student_name, mine.order_number); return; }
-      enterWaiting();
-    } else {
-      // 본인 확인 전 — 학번·성명 입력 화면
-      show('identity');
-    }
+    // 페이지에 들어올 때마다 항상 학번·성명을 새로 입력하도록 함
+    localStorage.removeItem(ID_KEY);
+    localStorage.removeItem(NAME_KEY);
+    document.getElementById('student-id').value = '';
+    document.getElementById('student-name').value = '';
+    show('identity');
   }
 
   await init();
