@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>군사영어-발표 순서 신청</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+<header>
+  <a href="mil_eng_apply.html" class="back-link">← 메인</a>
+  <h1>발표 순서 신청</h1>
+</header>
+
+<main class="container" style="max-width:520px">
+
+  <!-- 대기 안내 (신청 미오픈) -->
+  <div id="waiting-section" class="section-card hidden">
+    <div class="blocked-msg">
+      <div class="icon">⏳</div>
+      <h2>아직 신청이 시작되지 않았습니다</h2>
+      <p class="text-muted mt-1">교수님이 신청을 시작하면 자동으로 화면이 바뀝니다.</p>
+    </div>
+  </div>
+
+  <!-- 본인 확인 (최초 1회) -->
+  <div id="identity-section" class="section-card hidden">
+    <h2>본인 확인</h2>
+    <p class="text-muted" style="margin-bottom:1rem">발표 순서를 신청하기 전에 학번과 이름을 입력하세요. 이후에는 번호만 입력하면 됩니다.</p>
+
+    <div class="form-group">
+      <label for="student-id">학번 <span style="color:#e84444">*</span></label>
+      <input type="text" id="student-id" placeholder="학번을 입력하세요" maxlength="20"/>
+    </div>
+    <div class="form-group">
+      <label for="student-name">이름 <span style="color:#e84444">*</span></label>
+      <input type="text" id="student-name" placeholder="이름을 입력하세요" maxlength="20"/>
+    </div>
+
+    <div id="identity-error" class="msg msg-error hidden"></div>
+    <button class="btn btn-primary" id="identity-btn" style="width:100%;margin-top:.5rem">확인</button>
+  </div>
+
+  <!-- 번호 선택 -->
+  <div id="pick-section" class="section-card hidden">
+    <div id="pick-greeting" style="background:#e8f0ff;color:#4a7fff;font-weight:600;font-size:.9rem;padding:.5rem .9rem;border-radius:8px;margin-bottom:1rem"></div>
+    <h2>몇 번째로 발표할까요?</h2>
+
+    <div class="form-group">
+      <label>발표 순번 <span style="color:#e84444">*</span>
+        <span id="range-hint" class="input-hint"></span>
+      </label>
+      <div class="input-row">
+        <input type="number" id="order-input" inputmode="numeric" placeholder="번호 입력" min="1"/>
+        <button class="btn btn-primary" id="pick-btn">신청</button>
+      </div>
+    </div>
+
+    <div id="pick-error" class="msg msg-error hidden"></div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:1.1rem 0 .5rem">
+      <strong style="font-size:.9rem;color:#333">신청 가능한 순번</strong>
+      <span class="text-muted" id="avail-count"></span>
+    </div>
+    <div id="avail-list" style="display:flex;flex-wrap:wrap;gap:.4rem"></div>
+  </div>
+
+  <!-- 완료 -->
+  <div id="done-section" class="section-card hidden">
+    <div style="text-align:center;padding:1.5rem 0">
+      <div style="font-size:2.5rem;margin-bottom:.75rem">✅</div>
+      <h2 style="margin-bottom:.5rem">신청 완료</h2>
+      <p class="text-muted" id="done-name"></p>
+      <div style="background:#e8f0ff;border-radius:8px;padding:1.25rem;text-align:center;margin-top:1rem">
+        <div id="done-number" style="font-size:2.2rem;font-weight:700;color:#4a7fff"></div>
+        <div style="color:#555;margin-top:.4rem">번째 발표</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 로딩 -->
+  <div id="loading-section" class="section-card" style="text-align:center;padding:2rem">
+    <p class="text-muted">불러오는 중...</p>
+  </div>
+
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/order_student.js"></script>
+</body>
+</html>

@@ -50,4 +50,5 @@ const TABLES = {
   WIN_HISTORY: 'win_history',
   WIN_RECORDS: 'win_records',
   STUDENTS:    'students',
+  PRESENTATION_ORDERS: 'presentation_orders',
 };

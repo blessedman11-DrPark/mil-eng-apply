@@ -154,6 +154,17 @@ tr:hover td { background: #f8faff; }
 .rank-2 { background: #c0c0c0; color: #444; }
 .rank-3 { background: #cd7f32; color: #fff; }
 
+/* ===== Presentation order ===== */
+.order-chip { padding: .4rem .7rem; border: 1px solid #bed0ff; background: #f4f8ff; color: #2f5fd6; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; font-family: inherit; min-width: 2.6rem; transition: background .12s; }
+.order-chip:hover { background: #e0ebff; }
+.order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: .6rem; }
+.order-cell { display: flex; align-items: center; gap: .55rem; padding: .55rem .7rem; border: 1px solid #eaeef5; border-radius: 8px; background: #fafbfd; }
+.order-cell.filled { border-color: #bed0ff; background: #e8f0ff; }
+.order-cell-num { flex-shrink: 0; width: 1.9rem; height: 1.9rem; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #fff; font-weight: 700; font-size: .85rem; color: #666; }
+.order-cell.filled .order-cell-num { background: #4a7fff; color: #fff; }
+.order-cell-name { font-size: .88rem; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.order-cell:not(.filled) .order-cell-name { color: #bbb; }
+
 /* ===== Responsive ===== */
 @media (max-width: 640px) {
   header h1 { font-size: 1rem; }
@@ -162,4 +173,5 @@ tr:hover td { background: #f8faff; }
   .modal { padding: 1.25rem; }
   .choice-row { grid-template-columns: 1fr; }
   .section-card { padding: 1rem; }
+  .order-grid { grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); }
 }
