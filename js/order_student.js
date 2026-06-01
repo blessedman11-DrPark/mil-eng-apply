@@ -57,20 +57,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ── 남은 번호 렌더링 ──────────────────────────────────────
   function renderAvailable(claims) {
     const taken = new Set(claims.map(c => c.order_number));
-    const remaining = [];
-    for (let n = 1; n <= total; n++) if (!taken.has(n)) remaining.push(n);
+    let remainingCount = 0;
+    let html = '';
+    for (let n = 1; n <= total; n++) {
+      if (taken.has(n)) {
+        html += `<button type="button" class="order-chip taken" disabled>${n} <span aria-hidden="true">✕</span></button>`;
+      } else {
+        remainingCount++;
+        html += `<button type="button" class="order-chip" data-n="${n}">${n}</button>`;
+      }
+    }
 
-    document.getElementById('avail-count').textContent = `${remaining.length} / ${total}개`;
+    document.getElementById('avail-count').textContent = `${remainingCount} / ${total}개`;
 
     const wrap = document.getElementById('avail-list');
-    if (!remaining.length) {
-      wrap.innerHTML = '<span class="text-muted">남은 순번이 없습니다.</span>';
-      return;
-    }
-    wrap.innerHTML = remaining.map(n =>
-      `<button type="button" class="order-chip" data-n="${n}">${n}</button>`
-    ).join('');
-    wrap.querySelectorAll('.order-chip').forEach(btn => {
+    wrap.innerHTML = html;
+    wrap.querySelectorAll('.order-chip[data-n]').forEach(btn => {
       btn.addEventListener('click', () => {
         document.getElementById('order-input').value = btn.dataset.n;
         clearError('pick-error');

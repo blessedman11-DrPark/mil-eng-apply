@@ -157,6 +157,9 @@ tr:hover td { background: #f8faff; }
 /* ===== Presentation order ===== */
 .order-chip { padding: .4rem .7rem; border: 1px solid #bed0ff; background: #f4f8ff; color: #2f5fd6; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; font-family: inherit; min-width: 2.6rem; transition: background .12s; }
 .order-chip:hover { background: #e0ebff; }
+.order-chip.taken { border-color: #f5bebe; background: #fde8e8; color: #c42c2c; cursor: not-allowed; text-decoration: line-through; }
+.order-chip.taken:hover { background: #fde8e8; }
+.order-chip.taken span { text-decoration: none; margin-left: .15rem; font-weight: 700; }
 .order-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: .6rem; }
 .order-cell { display: flex; align-items: center; gap: .55rem; padding: .55rem .7rem; border: 1px solid #eaeef5; border-radius: 8px; background: #fafbfd; }
 .order-cell.filled { border-color: #bed0ff; background: #e8f0ff; }
