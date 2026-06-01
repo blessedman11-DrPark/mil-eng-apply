@@ -183,23 +183,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { name } = getIdentity();
     document.getElementById('waiting-name').textContent = name ? `${name} 학생` : '';
     document.getElementById('waiting-msg').classList.add('hidden');
+    if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
+    const btn = document.getElementById('waiting-go-btn');
+    btn.disabled = false;
+    btn.textContent = '신청하기';
     show('waiting');
   }
 
   // [신청하기] 버튼 — 누른 순간의 신청 상태로 분기 (공정)
+  let cooldownTimer = null;
+
+  function startCooldown(seconds) {
+    const btn = document.getElementById('waiting-go-btn');
+    const msg = document.getElementById('waiting-msg');
+    const base = '아직 신청을 받지 않습니다. 계속 누르지 마시고 잠시 기다려 주세요.';
+    msg.classList.remove('hidden');
+    btn.disabled = true;
+
+    let remain = seconds;
+    const render = () => {
+      msg.textContent = `${base} (${remain}초 후 다시 시도 가능)`;
+      btn.textContent = `${remain}초 후 다시 시도`;
+    };
+    render();
+
+    if (cooldownTimer) clearInterval(cooldownTimer);
+    cooldownTimer = setInterval(() => {
+      remain--;
+      if (remain <= 0) {
+        clearInterval(cooldownTimer);
+        cooldownTimer = null;
+        btn.disabled = false;
+        btn.textContent = '신청하기';
+        msg.textContent = base;
+      } else {
+        render();
+      }
+    }, 1000);
+  }
+
   document.getElementById('waiting-go-btn').addEventListener('click', async () => {
     const btn = document.getElementById('waiting-go-btn');
+    if (btn.disabled) return;
     btn.disabled = true;
     const { data: s } = await db.from(TABLES.SETTINGS).select('order_apply_open, order_total').single();
-    btn.disabled = false;
     if (s?.order_total) total = s.order_total;
 
     if (s?.order_apply_open) {
+      btn.disabled = false;
       await advanceFromWaiting();
     } else {
-      const msg = document.getElementById('waiting-msg');
-      msg.textContent = '아직 신청을 받지 않습니다. 교수님의 신청 시작 안내 후 다시 눌러주세요.';
-      msg.classList.remove('hidden');
+      // 대기 상태 — 5초간 버튼 비활성화 + 안내
+      startCooldown(5);
     }
   });
 
