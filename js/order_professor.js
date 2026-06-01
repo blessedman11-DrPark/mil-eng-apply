@@ -95,17 +95,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadGrid();
   });
 
-  // ── Realtime ──────────────────────────────────────────────
+  // ── 실시간 갱신 (Realtime + 폴링 안전장치) ─────────────────
+  function setBadge(connected) {
+    document.getElementById('realtime-badge').innerHTML = connected
+      ? '<span class="realtime-dot" style="background:#2aa058"></span>실시간 연결됨'
+      : '<span class="realtime-dot" style="background:#f5a623"></span>자동 새로고침 중';
+  }
+
   function setupRealtime() {
+    // 즉시 갱신용 Realtime 구독
     db.channel('order-prof')
       .on('postgres_changes',
         { event: '*', schema: 'public', table: TABLES.PRESENTATION_ORDERS },
         () => loadGrid())
-      .subscribe(status => {
-        document.getElementById('realtime-badge').innerHTML =
-          (status === 'SUBSCRIBED' ? '<span class="realtime-dot" style="background:#2aa058"></span>실시간 연결됨'
-                                   : '<span class="realtime-dot"></span>연결 중...');
-      });
+      .subscribe(status => setBadge(status === 'SUBSCRIBED'));
+
+    // Realtime 미사용 환경 대비 — 2.5초마다 현황 자동 새로고침
+    setInterval(loadGrid, 2500);
   }
 
   await loadSettings();
