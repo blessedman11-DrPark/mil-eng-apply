@@ -114,6 +114,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     setInterval(loadGrid, 2500);
   }
 
+  // ── 수동 새로고침 (DB에서 현황 즉시 재조회) ────────────────
+  document.getElementById('refresh-grid-btn').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    await loadGrid();
+    btn.disabled = false;
+    showToast('배정 현황을 새로고침했습니다.', 'success');
+  });
+
   await loadSettings();
   await loadGrid();
   setupRealtime();
