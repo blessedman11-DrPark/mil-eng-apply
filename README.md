@@ -4,9 +4,22 @@
 
 ## 주요 기능
 
-- **학생**: 희망 문장 번호 1~3지망 신청, 배정 결과 조회
-- **교수**: 신청 현황 실시간 모니터링, 추첨 배정 실행, 데이터 관리
+- **문장 신청 (학생)**: 희망 문장 번호 1~3지망 신청, 배정 결과 조회
+- **발표 순서 신청 (학생)**: 학번·성명 입력 후 대기 → 교수가 신청을 열면 발표 순번을 **선착순**으로 신청
+- **교수**: 신청 현황 실시간 모니터링, 추첨 배정 실행, 발표 순서 관리, 데이터 관리
 - **통계**: 학생별 누적 당첨 횟수, 회차별 기록 조회 (암호 보호)
+
+## 최근 업데이트 (2026-06-02) — 발표 순서 신청 기능 추가
+
+| 항목 | 내용 |
+|---|---|
+| 발표 순서 선착순 신청 | 학생이 발표 순번(1~N)을 선착순으로 신청. `presentation_orders.order_number` **UNIQUE 제약**으로 동시 신청 시에도 중복 배정 없음 (22명 동시 접속 부하 테스트 통과) |
+| 미리 입력 후 대기 | 학생이 학번·성명을 미리 입력하고 대기 → 교수가 "신청 받기"를 켠 뒤 **[신청하기] 버튼**을 누르면 번호 신청 화면으로 (자동 전환 없음 → 공정성 확보) |
+| 연타 방지 | 신청 시작 전 [신청하기]를 누르면 **5초간 버튼 비활성화** + 카운트다운 안내 |
+| 매번 새 입력 | 발표 순서 페이지 진입 시 항상 학번·성명을 새로 입력 (이전 값 미사용) |
+| 교수 실시간 현황 | 1~N번 배정 현황을 Realtime + **2.5초 폴링**으로 자동 갱신, **🔄 새로고침** 버튼으로 즉시 재조회 |
+| 총 순번 수 설정 | 교수 화면에서 총 발표 순번 수를 설정 (기본 22) → 다른 과목/분반에서도 재사용 가능 |
+| 메인 화면 그룹화 | 학생용 / 교수용 진입 카드를 부드러운 색상 박스로 그룹화 |
 
 ## 최근 업데이트 (2026-05-11)
 
@@ -23,9 +36,11 @@
 
 | 화면 | 설명 |
 |---|---|
-| 메인 (`mil_eng_apply.html`) | 교수 / 학생 / 통계 진입 |
-| 학생 (`student.html`) | 희망 문장 신청 및 배정 결과 확인 |
+| 메인 (`mil_eng_apply.html`) | 학생용 / 교수용 / 통계 진입 (그룹 박스) |
+| 문장 신청 (`student.html`) | 희망 문장 신청 및 배정 결과 확인 |
+| 발표 순서 신청 (`order_student.html`) | 학번·성명 입력 → 대기 → 발표 순번 선착순 신청 |
 | 교수 (`professor.html`) | 대시보드 (설정·현황·배정결과·통계) |
+| 발표 순서 관리 (`order_professor.html`) | 신청 시작/마감, 총 순번 수 설정, 실시간 배정 현황, 초기화 |
 | 통계 (`stats.html`) | 학생별 당첨 현황, 회차별 기록 |
 
 ## 교수 대시보드 — 설정 탭 기능
@@ -53,6 +68,19 @@
 3. 2지망, 3지망도 동일 방식으로 반복
 4. 3지망까지 모두 탈락한 학생은 미배정 처리
 
+## 발표 순서 신청 흐름
+
+1. **학생**: 발표 순서 페이지 접속 → 학번·성명 입력 → **대기 화면**
+2. 교수가 "신청 받기"를 켠 뒤, 학생이 **[신청하기]** 버튼을 누름
+   - 신청 받는 중 → 번호 신청 화면으로 이동
+   - 아직 마감 → "아직 신청을 받지 않습니다" 안내 + **5초간 버튼 비활성화**(연타 방지)
+3. 원하는 번호 신청 → `INSERT` 시도
+   - 성공 → 배정 완료
+   - **UNIQUE 충돌(23505)** → "이미 선택된 번호" 안내 + 남은 번호 갱신 후 재신청
+4. **교수**: 1~N번 배정 현황을 실시간(Realtime + 2.5초 폴링)으로 확인, 🔄 새로고침·전체 초기화 가능
+
+> 선착순 보장은 `order_number` **기본키(UNIQUE)** 제약으로 처리 → 동시 신청 시 DB가 1명만 받아들이고 나머지는 거부. `students` 테이블과 독립적이라 **다른 과목/분반에서도 재사용** 가능.
+
 ## 기술 스택
 
 - **Frontend**: Vanilla HTML / CSS / JavaScript
@@ -64,18 +92,22 @@
 ## 프로젝트 구조
 
 ```
-├── mil_eng_apply.html     # 메인 페이지
-├── student.html           # 학생 신청 페이지
+├── mil_eng_apply.html     # 메인 페이지 (학생용/교수용 그룹)
+├── student.html           # 문장 신청 페이지
+├── order_student.html     # 발표 순서 신청 페이지 (학생)
 ├── professor.html         # 교수 대시보드
+├── order_professor.html   # 발표 순서 관리 (교수)
 ├── stats.html             # 통계 페이지
 ├── css/
 │   └── style.css
 ├── js/
 │   ├── config.js          # Supabase 설정, ROUND_WEEK_MAP (회차↔주차 매핑)
-│   ├── supabase.js        # DB 클라이언트
-│   ├── algorithm.js       # 배정 알고리즘
-│   ├── student.js
-│   ├── professor.js
+│   ├── supabase.js        # DB 클라이언트, TABLES 상수
+│   ├── algorithm.js       # 문장 배정 알고리즘
+│   ├── student.js         # 문장 신청 로직
+│   ├── order_student.js   # 발표 순서 신청 로직 (학생)
+│   ├── professor.js       # 교수 대시보드 로직
+│   ├── order_professor.js # 발표 순서 관리 로직 (교수)
 │   └── stats.js
 └── .github/workflows/
     └── deploy.yml         # 자동 배포
@@ -96,12 +128,13 @@ const ROUND_WEEK_MAP = { 1: 6, 2: 7, 3: 10 };
 
 | 테이블 | 설명 |
 |---|---|
-| `settings` | 총 문장 수, 신청 허용 여부, 배정 완료 여부, 교수 비밀번호 |
+| `settings` | 총 문장 수, 신청 허용 여부, 배정 완료 여부, 교수 비밀번호 / **발표 순서용**: `order_apply_open`(신청 받기), `order_total`(총 순번 수) |
 | `students` | 전체 수강생 명단 (student_id PK, student_name) |
 | `submissions` | 학생 신청 데이터 (학번, 이름, 1~3지망, 배정 결과) |
 | `rounds` | 회차 기록 |
 | `win_history` | 학생별 누적 당첨 횟수 |
 | `win_records` | 회차별 당첨 상세 기록 (`assigned_sentence` NULL 허용) |
+| `presentation_orders` | 발표 순서 신청 (`order_number` PK/UNIQUE, `student_id`, `student_name`, `claimed_at`) |
 
 ## 배포 설정
 
@@ -147,6 +180,11 @@ CREATE POLICY "anon select win_records" ON public.win_records FOR SELECT TO anon
 CREATE POLICY "anon insert win_records" ON public.win_records FOR INSERT TO anon WITH CHECK (true);
 CREATE POLICY "anon update win_records" ON public.win_records FOR UPDATE TO anon USING (true);
 CREATE POLICY "anon delete win_records" ON public.win_records FOR DELETE TO anon USING (true);
+
+-- presentation_orders (발표 순서)
+CREATE POLICY "anon select presentation_orders" ON public.presentation_orders FOR SELECT TO anon USING (true);
+CREATE POLICY "anon insert presentation_orders" ON public.presentation_orders FOR INSERT TO anon WITH CHECK (true);
+CREATE POLICY "anon delete presentation_orders" ON public.presentation_orders FOR DELETE TO anon USING (true);
 ```
 
 ## DB 스키마 변경 이력
@@ -154,4 +192,16 @@ CREATE POLICY "anon delete win_records" ON public.win_records FOR DELETE TO anon
 ```sql
 -- win_records.assigned_sentence NOT NULL 제약 해제 (수동 추가 시 배정 문장 생략 허용)
 ALTER TABLE win_records ALTER COLUMN assigned_sentence DROP NOT NULL;
+
+-- 발표 순서 기능 (2026-06-02)
+CREATE TABLE presentation_orders (
+  order_number int PRIMARY KEY,          -- 선착순 보장 (UNIQUE)
+  student_id   text,
+  student_name text,
+  claimed_at   timestamptz DEFAULT now()
+);
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS order_apply_open boolean DEFAULT false;
+ALTER TABLE settings ADD COLUMN IF NOT EXISTS order_total int DEFAULT 22;
+-- (선택) 더 즉각적인 실시간 갱신을 원하면 Database → Replication에서
+--        presentation_orders 테이블을 Realtime 발행 목록에 추가
 ```
