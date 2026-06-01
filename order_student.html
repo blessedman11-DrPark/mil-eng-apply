@@ -19,10 +19,12 @@
   <div id="waiting-section" class="section-card hidden">
     <div class="blocked-msg">
       <div class="icon">⏳</div>
-      <h2>신청 시작을 기다리는 중</h2>
+      <h2>대기 중</h2>
       <p id="waiting-name" style="font-weight:600;color:#4a7fff;margin-top:.5rem"></p>
-      <p class="text-muted mt-1">교수님이 신청을 시작하면 자동으로 신청 화면으로 넘어갑니다.<br/>이 화면을 닫지 말고 그대로 두세요.</p>
+      <p class="text-muted mt-1">교수님이 "신청 시작"을 안내하면 아래 <strong>신청하기</strong> 버튼을 누르세요.</p>
     </div>
+    <div id="waiting-msg" class="msg msg-warn hidden" style="margin-top:.5rem"></div>
+    <button class="btn btn-primary" id="waiting-go-btn" style="width:100%;margin-top:.5rem">신청하기</button>
   </div>
 
   <!-- 본인 확인 (학번·성명 입력 후 대기) -->

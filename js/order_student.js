@@ -1,5 +1,7 @@
 // order_student.js — 발표 순서 선착순 신청 (학생용)
-// 흐름: 학번·성명 입력 → (마감 상태면) 대기 → 교수가 신청 열면 자동으로 번호 신청 화면 → 신청
+// 흐름: 학번·성명 입력 → 대기 화면 → [신청하기] 버튼
+//   · 신청 받는 중이면 → 번호 신청 화면
+//   · 아직 안 받으면   → "아직 신청을 받지 않습니다" 안내 후 계속 대기
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (!initSupabase()) return;
@@ -17,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let total = 22;
   let channel = null;
-  let waitPoll = null;
 
   function show(name) {
     Object.values(sections).forEach(el => el.classList.add('hidden'));
@@ -50,7 +51,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── 완료 화면 ─────────────────────────────────────────────
   function showDone(name, number) {
-    stopWaitPoll();
     document.getElementById('done-name').textContent = name + ' 학생';
     document.getElementById('done-number').textContent = number + '번';
     show('done');
@@ -92,38 +92,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderAvailable(claims);
   }
 
-  // ── Realtime (현황 갱신 + 신청 열림 감지) ──────────────────
+  // ── Realtime (번호 신청 화면의 현황 실시간 갱신) ───────────
   function ensureRealtime() {
     if (channel) return;
     channel = db.channel('order-student')
       .on('postgres_changes',
         { event: '*', schema: 'public', table: TABLES.PRESENTATION_ORDERS },
         () => { if (!sections.pick.classList.contains('hidden')) refreshPick(); })
-      .on('postgres_changes',
-        { event: '*', schema: 'public', table: TABLES.SETTINGS },
-        () => syncOpenState())
       .subscribe();
   }
   function teardownRealtime() {
     if (channel) { db.removeChannel(channel); channel = null; }
   }
 
-  // ── 신청 오픈 상태 동기화 (대기↔신청 전환) ─────────────────
-  async function syncOpenState() {
-    const { data: s } = await db.from(TABLES.SETTINGS)
-      .select('order_apply_open, order_total').single();
-    if (!s) return;
-    if (s.order_total) total = s.order_total;
-
-    if (s.order_apply_open && !sections.waiting.classList.contains('hidden')) {
-      // 신청 열림 → 대기 중이던 학생을 번호 신청 화면으로
-      await advanceFromWaiting();
-    } else if (!s.order_apply_open && !sections.pick.classList.contains('hidden')) {
-      // 신청 닫힘 → 다시 대기로
-      enterWaiting();
-    }
-  }
-
+  // 대기 → (신청 가능하면) 번호 신청 화면 / 이미 신청했으면 완료
   async function advanceFromWaiting() {
     const { sid } = getIdentity();
     if (sid) {
@@ -132,15 +114,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (mine) { showDone(mine.student_name, mine.order_number); return; }
     }
     enterPick();
-  }
-
-  // ── 대기 화면 폴링 (Realtime 미사용 환경 대비) ─────────────
-  function startWaitPoll() {
-    if (waitPoll) return;
-    waitPoll = setInterval(syncOpenState, 4000);
-  }
-  function stopWaitPoll() {
-    if (waitPoll) { clearInterval(waitPoll); waitPoll = null; }
   }
 
   // ── 번호 신청 ─────────────────────────────────────────────
@@ -189,7 +162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ── 본인 확인 제출 (학번·성명 입력) ────────────────────────
-  document.getElementById('identity-btn').addEventListener('click', async () => {
+  document.getElementById('identity-btn').addEventListener('click', () => {
     clearError('identity-error');
     const sid  = document.getElementById('student-id').value.trim();
     const name = document.getElementById('student-name').value.trim();
@@ -197,11 +170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!name) { showError('identity-error', '이름을 입력해주세요.'); return; }
     localStorage.setItem(ID_KEY, sid);
     localStorage.setItem(NAME_KEY, name);
-
-    // 신청이 열려 있으면 바로 번호 신청, 아니면 대기
-    const { data: s } = await db.from(TABLES.SETTINGS).select('order_apply_open').single();
-    if (s?.order_apply_open) await advanceFromWaiting();
-    else enterWaiting();
+    enterWaiting();
   });
 
   document.getElementById('pick-btn').addEventListener('click', claimNumber);
@@ -213,14 +182,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   function enterWaiting() {
     const { name } = getIdentity();
     document.getElementById('waiting-name').textContent = name ? `${name} 학생` : '';
+    document.getElementById('waiting-msg').classList.add('hidden');
     show('waiting');
-    ensureRealtime();
-    startWaitPoll();
   }
+
+  // [신청하기] 버튼 — 누른 순간의 신청 상태로 분기 (공정)
+  document.getElementById('waiting-go-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('waiting-go-btn');
+    btn.disabled = true;
+    const { data: s } = await db.from(TABLES.SETTINGS).select('order_apply_open, order_total').single();
+    btn.disabled = false;
+    if (s?.order_total) total = s.order_total;
+
+    if (s?.order_apply_open) {
+      await advanceFromWaiting();
+    } else {
+      const msg = document.getElementById('waiting-msg');
+      msg.textContent = '아직 신청을 받지 않습니다. 교수님의 신청 시작 안내 후 다시 눌러주세요.';
+      msg.classList.remove('hidden');
+    }
+  });
 
   // ── 번호 신청 화면 ────────────────────────────────────────
   async function enterPick() {
-    stopWaitPoll();
     const { name } = getIdentity();
     document.getElementById('pick-greeting').textContent = `${name} 학생, 원하는 순번을 선택하세요.`;
     document.getElementById('range-hint').textContent = `(1 ~ ${total})`;
@@ -232,26 +216,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // ── 초기 로드 ─────────────────────────────────────────────
   async function init() {
-    const { data: settings, error } = await db.from(TABLES.SETTINGS)
-      .select('order_apply_open, order_total').single();
-
+    const { data: settings } = await db.from(TABLES.SETTINGS)
+      .select('order_total').single();
     total = settings?.order_total || 22;
 
     const { sid } = getIdentity();
 
-    // 이미 본인 확인을 마친 학생
     if (sid) {
+      // 이미 본인 확인 완료 — 이미 신청했으면 결과, 아니면 대기 화면
       const claims = await fetchClaims();
       const mine = claims.find(c => c.student_id === sid);
       if (mine) { showDone(mine.student_name, mine.order_number); return; }
-      if (settings?.order_apply_open) { enterPick(); return; }
       enterWaiting();
-      return;
+    } else {
+      // 본인 확인 전 — 학번·성명 입력 화면
+      show('identity');
     }
-
-    // 본인 확인 전 — 마감 상태여도 미리 입력하고 대기할 수 있도록 입력 화면을 보여줌
-    if (error || !settings) { show('identity'); return; }
-    show('identity');
   }
 
   await init();
