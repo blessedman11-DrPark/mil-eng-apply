@@ -55,6 +55,52 @@ document.addEventListener('DOMContentLoaded', async () => {
     setToggle(!!data?.order_apply_open);
   }
 
+  // ── 명단 로드/저장 ────────────────────────────────────────
+  function rosterToText(arr) {
+    return (arr || []).map(s => `${s.student_id} ${s.student_name}`).join('\n');
+  }
+
+  function parseRoster(text) {
+    const list = [];
+    const seen = new Set();
+    text.split('\n').forEach(line => {
+      const t = line.trim();
+      if (!t) return;
+      // 학번 이름 (공백/탭/콤마 구분). 첫 토큰=학번, 나머지=이름
+      const parts = t.split(/[\s,\t]+/);
+      const id = parts.shift();
+      const name = parts.join(' ').trim();
+      if (!id || !name || seen.has(id)) return;
+      seen.add(id);
+      list.push({ student_id: id, student_name: name });
+    });
+    return list;
+  }
+
+  async function loadRoster() {
+    const { data } = await db.from(TABLES.SETTINGS).select('order_roster').single();
+    const arr = Array.isArray(data?.order_roster) ? data.order_roster : [];
+    document.getElementById('roster-input').value = rosterToText(arr);
+    document.getElementById('roster-count').textContent = arr.length ? `(${arr.length}명)` : '(미등록)';
+  }
+
+  document.getElementById('save-roster-btn').addEventListener('click', async () => {
+    const list = parseRoster(document.getElementById('roster-input').value);
+    if (!list.length) { showToast('등록할 명단이 없습니다.', 'error'); return; }
+    const { error } = await db.from(TABLES.SETTINGS).update({ order_roster: list }).eq('id', 1);
+    if (error) { showToast('저장 실패: ' + error.message, 'error'); return; }
+    showToast(`명단 ${list.length}명 저장 완료`, 'success');
+    loadRoster();
+  });
+
+  document.getElementById('clear-roster-btn').addEventListener('click', async () => {
+    if (!confirm('등록된 발표자 명단을 비웁니다. 계속할까요?')) return;
+    const { error } = await db.from(TABLES.SETTINGS).update({ order_roster: [] }).eq('id', 1);
+    if (error) { showToast('비우기 실패: ' + error.message, 'error'); return; }
+    showToast('명단을 비웠습니다.', 'success');
+    loadRoster();
+  });
+
   function setToggle(open) {
     document.getElementById('open-toggle').checked = open;
     const label = document.getElementById('open-label');
@@ -109,6 +155,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   await loadSettings();
+  await loadRoster();
   await loadGrid();
   setupRealtime();
 });

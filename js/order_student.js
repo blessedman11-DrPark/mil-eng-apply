@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   let total = 22;
+  let roster = [];     // [{ student_id, student_name }]
   let channel = null;
 
   function show(name) {
@@ -148,14 +149,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ── 본인 확인 제출 ────────────────────────────────────────
+  function populateRoster() {
+    const sel = document.getElementById('student-select');
+    sel.innerHTML = '<option value="">— 이름을 선택하세요 —</option>' +
+      roster.map(s =>
+        `<option value="${escHtml(s.student_id)}">${escHtml(s.student_name)} (${escHtml(s.student_id)})</option>`
+      ).join('');
+  }
+
   document.getElementById('identity-btn').addEventListener('click', () => {
     clearError('identity-error');
-    const sid  = document.getElementById('student-id').value.trim();
-    const name = document.getElementById('student-name').value.trim();
-    if (!sid)  { showError('identity-error', '학번을 입력해주세요.'); return; }
-    if (!name) { showError('identity-error', '이름을 입력해주세요.'); return; }
-    localStorage.setItem(ID_KEY, sid);
-    localStorage.setItem(NAME_KEY, name);
+    const sid = document.getElementById('student-select').value;
+    if (!sid) { showError('identity-error', '명단에서 본인 이름을 선택해주세요.'); return; }
+    const entry = roster.find(s => String(s.student_id) === String(sid));
+    if (!entry) { showError('identity-error', '명단에서 본인 이름을 선택해주세요.'); return; }
+    localStorage.setItem(ID_KEY, String(entry.student_id));
+    localStorage.setItem(NAME_KEY, entry.student_name);
     enterPick();
   });
 
@@ -177,10 +186,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ── 초기 로드 ─────────────────────────────────────────────
   async function init() {
     const { data: settings, error } = await db.from(TABLES.SETTINGS)
-      .select('order_apply_open, order_total').single();
+      .select('order_apply_open, order_total, order_roster').single();
     if (error || !settings) { show('waiting'); return; }
 
     total = settings.order_total || 22;
+    roster = Array.isArray(settings.order_roster) ? settings.order_roster : [];
 
     if (!settings.order_apply_open) { show('waiting'); return; }
 
@@ -192,6 +202,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (mine) { showDone(mine.student_name, mine.order_number); return; }
       enterPick();
     } else {
+      populateRoster();
       show('identity');
     }
   }

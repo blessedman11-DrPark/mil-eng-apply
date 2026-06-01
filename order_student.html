@@ -27,15 +27,13 @@
   <!-- 본인 확인 (최초 1회) -->
   <div id="identity-section" class="section-card hidden">
     <h2>본인 확인</h2>
-    <p class="text-muted" style="margin-bottom:1rem">발표 순서를 신청하기 전에 학번과 이름을 입력하세요. 이후에는 번호만 입력하면 됩니다.</p>
+    <p class="text-muted" style="margin-bottom:1rem">명단에서 본인 이름을 선택하세요.</p>
 
     <div class="form-group">
-      <label for="student-id">학번 <span style="color:#e84444">*</span></label>
-      <input type="text" id="student-id" placeholder="학번을 입력하세요" maxlength="20"/>
-    </div>
-    <div class="form-group">
-      <label for="student-name">이름 <span style="color:#e84444">*</span></label>
-      <input type="text" id="student-name" placeholder="이름을 입력하세요" maxlength="20"/>
+      <label for="student-select">이름 선택 <span style="color:#e84444">*</span></label>
+      <select id="student-select">
+        <option value="">— 이름을 선택하세요 —</option>
+      </select>
     </div>
 
     <div id="identity-error" class="msg msg-error hidden"></div>
